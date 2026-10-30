@@ -411,7 +411,7 @@
         </div>
     </div>
 
-    <!-- JS App Logic with Vercel Serverless Sync -->
+    <!-- JS App Logic with Daily Rotation & Vercel Sync -->
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
             try {
@@ -496,10 +496,10 @@
                 checkDailyContent();
                 calculateDaysTogether();
                 renderAll();
-                pullFromCloud(); // Загружаем актуальные данные с сервера при старте
+                pullFromCloud();
             } catch(e) {}
             
-            // Каждые 2.5 секунды опрашиваем твой сервер Vercel для мгновенного обновления на iPhone и Android
+            // Синхронизация данных с сервером каждые 2.5 секунды
             setInterval(pullFromCloud, 2500);
         };
 
@@ -595,7 +595,7 @@
             updateUserUI();
         }
 
-        // Сохранение данных локально и отправка на личный сервер Vercel (синхронизация для iPhone и Android)
+        // Сохранение данных локально и отправка на сервер Vercel
         function saveData() {
             try {
                 const jsonStr = JSON.stringify(appData);
@@ -611,7 +611,7 @@
             } catch(e) {}
         }
 
-        // Получение данных с сервера Vercel
+        // Запрос данных с сервера Vercel
         function pullFromCloud() {
             try {
                 fetch('/api/sync')
@@ -629,6 +629,7 @@
             } catch(e) {}
         }
 
+        // Проверка смены дня для автоматического обновления квестов и стирашек
         function checkDailyContent() {
             try {
                 const todayStr = new Date().toDateString();
