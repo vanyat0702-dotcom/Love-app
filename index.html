@@ -148,7 +148,7 @@
         }
 
         .scratch-text {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             padding: 0 15px;
             color: #fff;
@@ -344,7 +344,7 @@
     <!-- ВКЛАДКА 1: СТИРАШКИ -->
     <div id="tab-scratch" class="tab-content active">
         <h2>🎴 Ежедневные Стирашки</h2>
-        <div class="subtitle" id="subtitle-profile">Обновляется каждый день! 60% пошлости + 40% романтики ✨</div>
+        <div class="subtitle" id="subtitle-profile">Сотри защитный слой и узнай свое желание на сегодня!</div>
 
         <div style="margin-bottom: 10px; font-weight: bold; color: var(--accent);">🔥 Твои 3 стикера на сегодня:</div>
         <div id="my-scratch-cards"></div>
@@ -389,7 +389,7 @@
     <!-- ВКЛАДКА 4: ИГРЫ И КВЕСТЫ -->
     <div id="tab-games" class="tab-content">
         <h2>🎲 Рулетка & Квесты 18+</h2>
-        <div class="subtitle">60% пикантного огня и 40% нежности</div>
+        <div class="subtitle">Для тех, кому всегда мало огня (60% пошлости + 40% романтики)</div>
 
         <div class="card" style="text-align: center;">
             <h3 style="margin-bottom: 10px; color: var(--accent);">🎰 Рулетка Страсти</h3>
@@ -400,7 +400,7 @@
         </div>
 
         <div class="card">
-            <h3 style="margin-bottom: 10px; font-size: 16px;">🔥 Ежедневные Квесты пары</h3>
+            <h3 style="margin-bottom: 10px; font-size: 16px;">🔥 Интим-Квесты пары</h3>
             <div id="quests-container"></div>
         </div>
     </div>
@@ -443,37 +443,34 @@
     let currentProfile = localStorage.getItem('love_profile') || 'vanya';
     let tgUsernames = JSON.parse(localStorage.getItem('love_tg_users')) || { vanya: '', nastya: '' };
 
-    // База данных с балансом 60% пошлости (18+) и 40% романтики
-    const poolScratch = [
-        // Пошлость 60%
-        "🌶️ Интим в необычном месте квартиры (на полу/кухне)",
-        "🔥 Сделать страстный оральный ласк без прелюдий",
-        "😈 Доминирование: партнер выполняет любые приказы 10 минут",
-        "🥵 Использовать кубибики льда в самых чувствительных местах",
-        "💋 Интенсивный секс в позе сзади до полного изнеможения",
-        "🔥 Эротический массаж согреющим маслом с акцентом на бедра",
-        "🌶️ Острая ролевая игра: незнакомцы в отеле",
-        "😈 Раздеться полностью и выполнить танец соблазнения",
-        // Романтика 40%
-        "💖 Ужин при свечах и нежные поцелуи под пледом",
-        "✨ Медленный романтичный танец под любимую песню вдвоем",
-        "🌹 Сказать 10 искренних комплиментов глядя прямо в глаза",
-        "💌 Написать от руки нежное признание и спрятать в карман"
+    // База с балансом 60% пошлости и 40% романтики
+    const poolWishes = [
+        // Пошлость (60%)
+        "Сделать страстный массаж всего тела 18+",
+        "Горячее фото 18+ на выбор партнера",
+        "Исполнить любое пошлое желание за 5 минут",
+        "Медленный секс с завязанными глазами",
+        "Интим в необычном месте дома",
+        "Эротический танец для любимого человека",
+        // Романтика (40%)
+        "Ужин при свечах и продолжение в спальне",
+        "Завтрак в постель в обнаженном виде",
+        "Сказать 10 искренних комплиментов глядя в глаза"
     ];
 
     const roulettePool = [
         "🌶️ Где: На кухонном столе | Как: Медленно | Что: Страстный оральный ласк",
         "🔥 Где: В ванной под душем | Как: Стоя | Что: Жаркие поцелуи и проникновение",
-        "💋 Где: В спальне на постели | Как: С завязанными глазами | Что: Полное доминирование",
-        "✨ Где: На диване в гостиной | Как: В позе сзади | Что: Страстный экспресс-секс",
+        "💋 Где: В спальне на постели | Как: С завязанными глазами | Что: Полное доминирование партнера",
+        "✨ Где: На диване в гостиной | Как: В позе сзади | Что: Быстрый и страстный секс",
         "💖 Где: На полу на ковре | Как: Нежно и чувственно | Что: Долгие ласки и объятия"
     ];
 
-    const defaultQuestsPool = [
-        { text: "🔥 Отправить пикантное фото 18+ посреди рабочего дня", done: false },
-        { text: "🌶️ Ночной марафон на 3 горячие позиции подряд", done: false },
-        { text: "✨ Сделать расслабляющий массаж плеч и спины вечером", done: false },
-        { text: "💖 Сказать нежные слова любви перед сном", done: false }
+    const defaultQuests = [
+        { id: 1, text: "🔥 Отправить фото 18+ посреди рабочего дня", done: false },
+        { id: 2, text: "🌶️ Ночной марафон 3 позиции подряд", done: false },
+        { id: 3, text: "✨ Использовать масло для расслабляющего массажа", done: false },
+        { id: 4, text: "💖 Сказать самые нежные слова любви перед сном", done: false }
     ];
 
     function getTodayString() {
@@ -485,7 +482,7 @@
         document.getElementById('btn-vanya').classList.toggle('active', currentProfile === 'vanya');
         document.getElementById('btn-nastya').classList.toggle('active', currentProfile === 'nastya');
         
-        loadDailyContent();
+        loadScratchCards();
         loadWishes();
         loadChat();
         loadQuests();
@@ -504,8 +501,8 @@
         el.classList.add('active');
     }
 
-    // ГЕНЕРАЦИЯ ЕЖЕДНЕВНОГО КОНТЕНТА (60/40)
-    function loadDailyContent() {
+    // СТИРАШКИ С АВТОМАТИЧЕСКИМ ОБНОВЛЕНИЕМ КАЖДЫЙ ДЕНЬ
+    function loadScratchCards() {
         const today = getTodayString();
         const myContainer = document.getElementById('my-scratch-cards');
         const partnerContainer = document.getElementById('partner-scratch-cards');
@@ -519,10 +516,10 @@
 
         // Если наступил новый день — генерируем новые рандомные стирашки
         if (storedDate !== today || !myCards || !partnerCards) {
-            let shuffled = [...poolScratch].sort(() => 0.5 - Math.random());
+            let shuffled = [...poolWishes].sort(() => 0.5 - Math.random());
             myCards = [shuffled[0], shuffled[1], shuffled[2]];
             
-            let shuffledPartner = [...poolScratch].sort(() => 0.5 - Math.random());
+            let shuffledPartner = [...poolWishes].sort(() => 0.5 - Math.random());
             partnerCards = [shuffledPartner[0], shuffledPartner[1], shuffledPartner[2]];
 
             localStorage.setItem('love_date', today);
@@ -687,7 +684,7 @@
     function loadQuests() {
         const container = document.getElementById('quests-container');
         container.innerHTML = '';
-        let quests = JSON.parse(localStorage.getItem('love_quests')) || defaultQuestsPool;
+        let quests = JSON.parse(localStorage.getItem('love_quests')) || defaultQuests;
         quests.forEach((q, idx) => {
             const item = document.createElement('div');
             item.className = `wish-item ${q.done ? 'done' : ''}`;
@@ -700,7 +697,7 @@
     }
 
     function toggleQuest(idx) {
-        let quests = JSON.parse(localStorage.getItem('love_quests')) || defaultQuestsPool;
+        let quests = JSON.parse(localStorage.getItem('love_quests')) || defaultQuests;
         quests[idx].done = !quests[idx].done;
         localStorage.setItem('love_quests', JSON.stringify(quests));
         loadQuests();
