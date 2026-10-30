@@ -1,0 +1,933 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Love & Passion 18+</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        velvet: '#0a050d',
+                        cardBg: 'rgba(25, 10, 28, 0.75)',
+                        neonPink: '#ff0055',
+                        neonPurple: '#9d00ff',
+                        neonGold: '#ffb700',
+                        hotRose: '#ff2a6d'
+                    },
+                    boxShadow: {
+                        'neon': '0 0 15px rgba(255, 0, 85, 0.4), 0 0 30px rgba(157, 0, 255, 0.2)',
+                        'neon-gold': '0 0 15px rgba(255, 183, 0, 0.5)',
+                        'glow': '0 0 20px rgba(255, 42, 109, 0.6)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a050d;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 85, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(157, 0, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(10, 5, 13, 0.95) 0%, #0a050d 100%);
+            color: #f3e8ee;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(25, 12, 30, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 0, 85, 0.2);
+        }
+
+        .glass-card {
+            background: rgba(35, 15, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .active-tab {
+            color: #ff0055;
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.8);
+            border-bottom: 2px solid #ff0055;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(10, 5, 13, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 0, 85, 0.4);
+            border-radius: 4px;
+        }
+
+        .scratch-container {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            touch-action: none;
+            cursor: pointer;
+        }
+
+        .slot-machine {
+            perspective: 1000px;
+        }
+
+        .slot-reel {
+            transition: transform 3s cubic-bezier(0.15, 0.85, 0.35, 1.2);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .pulse-bg {
+            animation: pulseGlow 4s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Ambient Sparkles Background -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-neonPink/10 rounded-full blur-3xl pulse-bg"></div>
+        <div class="absolute bottom-1/3 right-1/4 w-80 h-80 bg-neonPurple/10 rounded-full blur-3xl pulse-bg" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="relative z-10 max-w-md mx-auto px-4 pt-4">
+
+        <!-- Header / User Switcher -->
+        <header class="glass-panel rounded-2xl p-3 mb-4 shadow-neon flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-neonPink to-neonPurple p-[2px] shadow-glow">
+                    <div class="w-full h-full bg-velvet rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-heart-fire text-neonPink text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-xs font-bold uppercase tracking-widest text-pink-300">Love & Passion 18+</h1>
+                    <p class="text-[10px] text-gray-400" id="currentDate">Сегодня: --.--.----</p>
+                </div>
+            </div>
+
+            <!-- Profile Selector Toggle -->
+            <div class="flex bg-black/40 p-1 rounded-xl border border-white/10">
+                <button id="btnUserVanya" onclick="setUser('vanya')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-mars text-blue-400"></i> Ваня
+                </button>
+                <button id="btnUserNastya" onclick="setUser('nastya')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-venus text-pink-400"></i> Настя
+                </button>
+            </div>
+
+            <!-- Settings Cog -->
+            <button onclick="openSettingsModal()" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition">
+                <i class="fa-solid fa-gear text-sm"></i>
+            </button>
+        </header>
+
+        <!-- Dynamic Content Tabs -->
+
+        <!-- TAB 1: STICKERS (SCRATCH CARDS) -->
+        <section id="tab-stickers" class="tab-content space-y-4">
+            <div class="glass-panel rounded-2xl p-4 text-center relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 w-16 h-16 bg-neonPink/20 rounded-full blur-xl"></div>
+                <h2 class="text-lg font-extrabold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-neonPink"></i>
+                    Дневные Тайные Стикеры
+                </h2>
+                <p class="text-xs text-gray-300 mt-1">
+                    Стриай серебристое покрытие пальцем, чтобы узнать своё секретное желание на сегодня!
+                </p>
+            </div>
+
+            <!-- Target User Selector for Stickers -->
+            <div class="flex gap-2 mb-2">
+                <button id="stickerOwnerVanya" onclick="switchStickerOwner('vanya')" class="flex-1 py-2 rounded-xl text-xs font-bold glass-card border border-white/10 transition">
+                    ♂ Для Вани (3)
+                </button>
+                <button id="stickerOwnerNastya" onclick="switchStickerOwner('nastya')" class="flex-1 py-2 rounded-xl text-xs font-bold glass-card border border-white/10 transition">
+                    ♀ Для Насти (3)
+                </button>
+            </div>
+
+            <!-- Scratch Cards Container -->
+            <div id="scratchCardsContainer" class="space-y-4">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- TAB 2: WISHLIST -->
+        <section id="tab-wishes" class="tab-content hidden space-y-4">
+            <div class="glass-panel rounded-2xl p-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-3">
+                    <i class="fa-solid fa-star text-neonGold"></i>
+                    Книга Капризов & Пожеланий
+                </h2>
+                
+                <!-- Add Wish Form -->
+                <div class="space-y-2">
+                    <input type="text" id="wishInput" placeholder="Напиши своё желание или каприз..." 
+                           class="w-full bg-black/50 border border-pink-500/30 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neonPink placeholder-gray-500">
+                    
+                    <div class="flex gap-2">
+                        <select id="wishCategory" class="bg-black/50 border border-pink-500/30 rounded-xl px-2 py-2 text-xs text-white focus:outline-none">
+                            <option value="18+">🔥 18+ Интимное</option>
+                            <option value="Романтика">💖 Романтика</option>
+                        </select>
+
+                        <button onclick="addWish()" class="flex-1 bg-gradient-to-r from-neonPink to-hotRose hover:opacity-90 font-bold text-xs py-2 rounded-xl text-white shadow-neon flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Добавить
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Categories -->
+            <div class="flex gap-2 text-xs">
+                <button id="wishFilterAll" onclick="renderWishes('all')" class="px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold">Все</button>
+                <button id="wishFilterVanya" onclick="renderWishes('vanya')" class="px-3 py-1.5 rounded-xl glass-card text-gray-300">От Вани</button>
+                <button id="wishFilterNastya" onclick="renderWishes('nastya')" class="px-3 py-1.5 rounded-xl glass-card text-gray-300">От Насти</button>
+            </div>
+
+            <!-- Wish List Container -->
+            <div id="wishesList" class="space-y-3">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- TAB 3: CHAT & HOT PHOTO LINK -->
+        <section id="tab-chat" class="tab-content hidden space-y-4">
+            <!-- HOT 18+ Direct Button -->
+            <div class="glass-panel rounded-2xl p-5 text-center space-y-3 border-2 border-neonPink/50 shadow-neon">
+                <div class="inline-flex p-3 rounded-full bg-neonPink/20 text-neonPink mb-1">
+                    <i class="fa-solid fa-fire-flame-curved text-3xl"></i>
+                </div>
+                <h3 class="text-base font-extrabold text-white">Быстрая Интимная Связь</h3>
+                <p class="text-xs text-gray-300">
+                    Нажми кнопку ниже, чтобы моментально перейти в ЛС партнёра в Telegram и отправить горячие 18+ кадры!
+                </p>
+                
+                <button onclick="sendHotPhotoToTG()" class="w-full py-3 rounded-xl bg-gradient-to-r from-neonPink via-hotRose to-neonPurple text-white font-black text-sm tracking-wide shadow-glow transform active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-camera-retro text-lg"></i>
+                    🔥 ОТПРАВИТЬ ФОТО 18+ В ЛС
+                </button>
+            </div>
+
+            <!-- Mini Love Notes / Chat -->
+            <div class="glass-panel rounded-2xl p-4 space-y-3">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-comments text-pink-400"></i>
+                    Записки Страсти & Комментарии
+                </h3>
+
+                <div id="chatMessages" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    <!-- Injected via JS -->
+                </div>
+
+                <div class="flex gap-2 pt-2 border-t border-white/10">
+                    <input type="text" id="chatInput" placeholder="Напиши милость или пошлость..." 
+                           class="flex-1 bg-black/50 border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-neonPink">
+                    <button onclick="sendChatMessage()" class="bg-neonPink px-4 py-2 rounded-xl text-white text-xs font-bold hover:bg-hotRose">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: QUESTS & ROULETTE -->
+        <section id="tab-quests" class="tab-content hidden space-y-5">
+            <!-- 1. Passion Roulette -->
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-3">
+                <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-dice text-neonGold text-base"></i>
+                    Рулетка Быстрой Страсти 18+
+                </h3>
+
+                <div class="grid grid-cols-3 gap-2 bg-black/60 p-2 rounded-xl border border-white/10 my-2 text-center text-xs">
+                    <div class="p-2 glass-card rounded-lg border-pink-500/20">
+                        <span class="text-[10px] text-gray-400 block mb-1">ГДЕ?</span>
+                        <span id="reelWhere" class="font-bold text-pink-300">❓</span>
+                    </div>
+                    <div class="p-2 glass-card rounded-lg border-purple-500/20">
+                        <span class="text-[10px] text-gray-400 block mb-1">КАК?</span>
+                        <span id="reelHow" class="font-bold text-purple-300">❓</span>
+                    </div>
+                    <div class="p-2 glass-card rounded-lg border-yellow-500/20">
+                        <span class="text-[10px] text-gray-400 block mb-1">ЧТО?</span>
+                        <span id="reelAction" class="font-bold text-yellow-300">❓</span>
+                    </div>
+                </div>
+
+                <button onclick="spinRoulette()" id="btnSpin" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-neonPurple to-neonPink font-bold text-xs text-white shadow-neon flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> КРУТИТЬ КОЛЕСО СТРАСТИ
+                </button>
+            </div>
+
+            <!-- 2. Quests Progress -->
+            <div class="glass-panel rounded-2xl p-4 space-y-3">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-neonGold"></i>
+                    Квесты & Челленджи 18+
+                </h3>
+
+                <div id="questsContainer" class="space-y-2">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- 3. Fantasies Matcher -->
+            <div class="glass-panel rounded-2xl p-4 space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-masks-theater text-neonPink"></i>
+                        Детектор Совпадения Фантазий
+                    </h3>
+                </div>
+                <p class="text-[11px] text-gray-300">
+                    Выберите ваши тайные желания. Фантазия раскроется как <b>«СОВПАДЕНИЕ»</b> только если вы ОБА ответили «Хочу» или «Готов(а)»!
+                </p>
+
+                <div id="fantasiesContainer" class="space-y-3 pt-1">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-velvet/90 backdrop-blur-xl border-t border-pink-500/20 px-3 py-2">
+        <div class="max-w-md mx-auto grid grid-cols-4 gap-1">
+            <button onclick="switchTab('stickers')" id="nav-stickers" class="flex flex-col items-center justify-center py-1 text-xs font-medium text-gray-400 transition active-tab">
+                <i class="fa-solid fa-box-open text-base mb-1"></i>
+                <span class="text-[10px]">Стирашки</span>
+            </button>
+            <button onclick="switchTab('wishes')" id="nav-wishes" class="flex flex-col items-center justify-center py-1 text-xs font-medium text-gray-400 transition">
+                <i class="fa-solid fa-heart text-base mb-1"></i>
+                <span class="text-[10px]">Капризы</span>
+            </button>
+            <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center justify-center py-1 text-xs font-medium text-gray-400 transition">
+                <i class="fa-solid fa-fire text-base mb-1"></i>
+                <span class="text-[10px]">18+ ЛС</span>
+            </button>
+            <button onclick="switchTab('quests')" id="nav-quests" class="flex flex-col items-center justify-center py-1 text-xs font-medium text-gray-400 transition">
+                <i class="fa-solid fa-gamepad text-base mb-1"></i>
+                <span class="text-[10px]">Игры & Квесты</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel rounded-2xl p-5 w-full max-w-sm space-y-4 border border-pink-500/30">
+            <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-neonPink"></i> Настройки Telegram
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1">Telegram @username Вани:</label>
+                    <div class="flex items-center bg-black/60 rounded-xl border border-white/10 px-3 py-2">
+                        <span class="text-gray-500 mr-1">@</span>
+                        <input type="text" id="inputUsernameVanya" class="bg-transparent text-white w-full focus:outline-none" placeholder="tikhon_official">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 mb-1">Telegram @username Насти:</label>
+                    <div class="flex items-center bg-black/60 rounded-xl border border-white/10 px-3 py-2">
+                        <span class="text-gray-500 mr-1">@</span>
+                        <input type="text" id="inputUsernameNastya" class="bg-transparent text-white w-full focus:outline-none" placeholder="nastya">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="saveSettings()" class="w-full py-2.5 rounded-xl bg-neonPink text-white font-bold text-xs shadow-neon">
+                Сохранить настройки
+            </button>
+        </div>
+    </div>
+
+    <!-- JS App Logic -->
+    <script>
+        // Init Telegram Web App
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
+
+        // --- App Data Pools ---
+        const STICKERS_POOL = [
+            { text: "🔞 Нежный минет с долгими ласками", category: "18+" },
+            { text: "🔞 Страстный кунилингус до оргазма", category: "18+" },
+            { text: "🔞 Секс в неожиданном месте квартиры", category: "18+" },
+            { text: "📸 Горячее фото 18+ прямо сейчас", category: "18+" },
+            { text: "📸 Фото 18+ на выбор партнера", category: "18+" },
+            { text: "🍿 Просмотр кино и обнимашки под пледом", category: "Романтика" },
+            { text: "🍳 Романтический завтрак в постель", category: "Романтика" },
+            { text: "🍷 Вкусный ужин при свечах", category: "Романтика" },
+            { text: "🌳 Вечерняя прогулка держась за руки", category: "Романтика" },
+            { text: "💆‍♂️ Эротический массаж всего тела с маслом", category: "18+" },
+            { text: "🔞 Быстрый и страстный секс (Быструш)", category: "18+" },
+            { text: "🎭 Ролевая игра с завязыванием глаз", category: "18+" },
+            { text: "👑 15 минут полного подчинения партнеру", category: "18+" },
+            { text: "🚿 Совместный горячий душ / ванная с пеной", category: "Романтика" }
+        ];
+
+        const ROULETTE_DATA = {
+            where: ["На кухне", "В душе", "На диване", "На столе", "На полу", "В кровати", "У зеркала"],
+            how: ["Завязав глаза", "Очень медленно", "Очень страстно", "Без рук", "С использованием масла", "В полной темноте"],
+            action: ["Оральные ласки", "Эротический массаж", "Поцелуи везде", "Исполнить каприз", "Секс 18+", "Полежать в обнимку"]
+        };
+
+        const QUESTS_DATA = [
+            { id: 1, title: "Секретное голосовое", desc: "Отправить партнеру пошлое шепотное голосовое в разгар дня", level: "Новички", done: false },
+            { id: 2, title: "Новое место", desc: "Заняться сексом там, где вы этого еще никогда не делали", level: "Экстрим", done: false },
+            { id: 3, title: "15 минут без одежды", desc: "Провести вечер дома без одежды, делая обычные дела", level: "Новички", done: false },
+            { id: 4, title: "Ролевое свидание", desc: "Придумать персонажей и встретиться будто вы незнакомы", level: "Мастера 18+", done: false }
+        ];
+
+        const FANTASIES_LIST = [
+            "Ролевая игра с костюмами",
+            "Связывание / легкое БДСМ",
+            "Секс перед большим зеркалом",
+            "Использование секс-игрушек",
+            "Интимный видеоархив для двоих",
+            "Публичный риск (в машине / на природе)"
+        ];
+
+        // --- State ---
+        let currentUser = 'vanya'; // 'vanya' | 'nastya'
+        let currentStickerOwner = 'vanya';
+        let usernames = { vanya: 'tikhon_official', nastya: 'nastya' };
+        
+        let appData = {
+            lastDate: '',
+            stickers: { vanya: [], nastya: [] },
+            wishes: [],
+            chat: [],
+            quests: QUESTS_DATA,
+            fantasies: {} // { fantasyIndex: { vanya: 'want', nastya: 'ready' } }
+        };
+
+        // --- Initialization ---
+        window.onload = function() {
+            loadLocalData();
+            checkDailyStickers();
+            setupDate();
+            renderAll();
+        };
+
+        function setupDate() {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('ru-RU');
+            document.getElementById('currentDate').innerText = `Сегодня: ${dateStr}`;
+        }
+
+        function loadLocalData() {
+            const savedUsernames = localStorage.getItem('love_usernames');
+            if (savedUsernames) usernames = JSON.parse(savedUsernames);
+
+            const savedData = localStorage.getItem('love_app_data');
+            if (savedData) {
+                appData = JSON.parse(savedData);
+            } else {
+                // Initial Default Wishes
+                appData.wishes = [
+                    { id: 1, text: "Хочу расслабляющий массаж спины", category: "Романтика", author: "nastya", done: false },
+                    { id: 2, text: "Хочу горячее фото 18+ в кружевном белье", category: "18+", author: "vanya", done: false }
+                ];
+                appData.chat = [
+                    { author: 'vanya', text: "Жду вечера, малышка! ❤️" }
+                ];
+            }
+
+            document.getElementById('inputUsernameVanya').value = usernames.vanya;
+            document.getElementById('inputUsernameNastya').value = usernames.nastya;
+        }
+
+        function saveData() {
+            localStorage.setItem('love_app_data', JSON.stringify(appData));
+            localStorage.setItem('love_usernames', JSON.stringify(usernames));
+        }
+
+        // Check if day changed & generate random stickers
+        function checkDailyStickers() {
+            const todayStr = new Date().toDateString();
+            if (appData.lastDate !== todayStr) {
+                appData.lastDate = todayStr;
+                appData.stickers.vanya = getRandomStickers(3);
+                appData.stickers.nastya = getRandomStickers(3);
+                saveData();
+            }
+        }
+
+        function getRandomStickers(count) {
+            const shuffled = [...STICKERS_POOL].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count).map((item, idx) => ({
+                id: idx,
+                text: item.text,
+                category: item.category,
+                scratched: false,
+                completed: false
+            }));
+        }
+
+        // --- User Switching ---
+        function setUser(user) {
+            currentUser = user;
+            document.getElementById('btnUserVanya').className = user === 'vanya' 
+                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
+                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
+
+            document.getElementById('btnUserNastya').className = user === 'nastya' 
+                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
+                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
+
+            renderAll();
+        }
+
+        function switchStickerOwner(owner) {
+            currentStickerOwner = owner;
+            renderStickers();
+        }
+
+        // --- Tab Switching ---
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active-tab'));
+            document.getElementById(`nav-${tabName}`).classList.add('active-tab');
+        }
+
+        // --- Render All Sections ---
+        function renderAll() {
+            renderStickers();
+            renderWishes('all');
+            renderChat();
+            renderQuests();
+            renderFantasies();
+        }
+
+        // --- STICKERS SCRATCH CARD LOGIC ---
+        function renderStickers() {
+            const container = document.getElementById('scratchCardsContainer');
+            container.innerHTML = '';
+
+            const ownerVanyaBtn = document.getElementById('stickerOwnerVanya');
+            const ownerNastyaBtn = document.getElementById('stickerOwnerNastya');
+
+            if (currentStickerOwner === 'vanya') {
+                ownerVanyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-neonPink text-white shadow-neon';
+                ownerNastyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold glass-card text-gray-400';
+            } else {
+                ownerNastyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-neonPink text-white shadow-neon';
+                ownerVanyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold glass-card text-gray-400';
+            }
+
+            const stickers = appData.stickers[currentStickerOwner] || [];
+
+            stickers.forEach((sticker, index) => {
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'glass-card rounded-2xl p-3 relative space-y-2 border border-pink-500/20';
+
+                cardWrapper.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-pink-400">Стикер #${index + 1}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full ${sticker.category === '18+' ? 'bg-red-500/30 text-red-300' : 'bg-pink-500/30 text-pink-300'}">${sticker.category}</span>
+                    </div>
+
+                    <div class="scratch-container flex items-center justify-center p-4 text-center bg-black/40 rounded-xl border border-white/5">
+                        <p class="text-sm font-extrabold text-white">${sticker.text}</p>
+                        <canvas id="canvas-${currentStickerOwner}-${index}" class="scratch-canvas ${sticker.scratched ? 'hidden' : ''}"></canvas>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-[11px] text-gray-400">
+                            ${sticker.completed ? '✅ Исполнено!' : (sticker.scratched ? '🔓 Стерто' : '🔒 Зашифровано')}
+                        </span>
+                        <button onclick="toggleStickerComplete('${currentStickerOwner}', ${index})" 
+                                class="px-3 py-1 rounded-xl text-xs font-bold ${sticker.completed ? 'bg-green-600 text-white' : 'bg-white/10 text-gray-300 hover:bg-neonPink'} transition">
+                            ${sticker.completed ? 'Готово!' : 'Отметить как сделано'}
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(cardWrapper);
+
+                if (!sticker.scratched) {
+                    setTimeout(() => initScratchCanvas(`canvas-${currentStickerOwner}-${index}`, currentStickerOwner, index), 50);
+                }
+            });
+        }
+
+        function initScratchCanvas(canvasId, owner, index) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            const ctx = canvas.getContext('2d');
+
+            // Scratch Foil Fill
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#c0c0c0');
+            grad.addColorStop(0.5, '#e6b8c7');
+            grad.addColorStop(1, '#8a8a8a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Text on Foil
+            ctx.fillStyle = '#4a0e2e';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('✨ СОТРИ МЕНЯ ПАЛЬЦЕМ ✨', canvas.width / 2, canvas.height / 2 + 4);
+
+            let isDrawing = false;
+
+            function scratch(e) {
+                if (!isDrawing) return;
+                const bounds = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const x = clientX - bounds.left;
+                const y = clientY - bounds.top;
+
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+
+                checkScratchPercent();
+            }
+
+            function checkScratchPercent() {
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let clearPixels = 0;
+                for (let i = 3; i < imgData.data.length; i += 4) {
+                    if (imgData.data[i] === 0) clearPixels++;
+                }
+                const percent = (clearPixels / (imgData.data.length / 4)) * 100;
+
+                if (percent > 45) {
+                    canvas.classList.add('hidden');
+                    appData.stickers[owner][index].scratched = true;
+                    saveData();
+                    triggerConfetti();
+                }
+            }
+
+            canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
+            canvas.addEventListener('mousemove', scratch);
+            window.addEventListener('mouseup', () => isDrawing = false);
+
+            canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
+            canvas.addEventListener('touchmove', scratch);
+            window.addEventListener('touchend', () => isDrawing = false);
+        }
+
+        function toggleStickerComplete(owner, index) {
+            appData.stickers[owner][index].completed = !appData.stickers[owner][index].completed;
+            if (appData.stickers[owner][index].completed) triggerConfetti();
+            saveData();
+            renderStickers();
+        }
+
+        // --- WISHES LOGIC ---
+        function addWish() {
+            const input = document.getElementById('wishInput');
+            const category = document.getElementById('wishCategory').value;
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            appData.wishes.unshift({
+                id: Date.now(),
+                text: text,
+                category: category,
+                author: currentUser,
+                done: false
+            });
+
+            input.value = '';
+            saveData();
+            renderWishes('all');
+            triggerConfetti();
+        }
+
+        function renderWishes(filter) {
+            const container = document.getElementById('wishesList');
+            container.innerHTML = '';
+
+            let filtered = appData.wishes;
+            if (filter === 'vanya') filtered = appData.wishes.filter(w => w.author === 'vanya');
+            if (filter === 'nastya') filtered = appData.wishes.filter(w => w.author === 'nastya');
+
+            filtered.forEach(wish => {
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-xl p-3 flex items-center justify-between border ${wish.done ? 'border-green-500/30 opacity-60' : 'border-white/10'}`;
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleWish(${wish.id})" class="w-6 h-6 rounded-lg border border-pink-500/50 flex items-center justify-center ${wish.done ? 'bg-green-500 text-white' : 'bg-black/40'}">
+                            ${wish.done ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+                        </button>
+                        <div>
+                            <p class="text-xs font-semibold text-white ${wish.done ? 'line-through text-gray-400' : ''}">${wish.text}</p>
+                            <span class="text-[10px] text-pink-300">От: ${wish.author === 'vanya' ? '♂ Вани' : '♀ Насти'} • ${wish.category}</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteWish(${wish.id})" class="text-gray-500 hover:text-red-400 text-xs px-2">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleWish(id) {
+            const wish = appData.wishes.find(w => w.id === id);
+            if (wish) {
+                wish.done = !wish.done;
+                if (wish.done) triggerConfetti();
+                saveData();
+                renderWishes('all');
+            }
+        }
+
+        function deleteWish(id) {
+            appData.wishes = appData.wishes.filter(w => w.id !== id);
+            saveData();
+            renderWishes('all');
+        }
+
+        // --- CHAT & HOT 18+ PHOTO LOGIC ---
+        function sendHotPhotoToTG() {
+            // Target recipient is the OTHER person
+            const recipientUser = currentUser === 'vanya' ? usernames.nastya : usernames.vanya;
+            const text = encodeURIComponent("🔥 Малыш, у меня для тебя кое-что очень горячее... Лови 18+ фото!");
+            const tgUrl = `https://t.me/${recipientUser}?text=${text}`;
+
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+                window.Telegram.WebApp.openTelegramLink(tgUrl);
+            } else {
+                window.open(tgUrl, '_blank');
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appData.chat.push({
+                author: currentUser,
+                text: text
+            });
+
+            input.value = '';
+            saveData();
+            renderChat();
+        }
+
+        function renderChat() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+
+            appData.chat.forEach(msg => {
+                const isMe = msg.author === currentUser;
+                const msgEl = document.createElement('div');
+                msgEl.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
+
+                msgEl.innerHTML = `
+                    <div class="max-w-[80%] rounded-2xl px-3 py-2 text-xs ${isMe ? 'bg-gradient-to-r from-neonPink to-hotRose text-white' : 'bg-black/60 border border-white/10 text-gray-200'}">
+                        <span class="text-[9px] block opacity-70 mb-0.5">${msg.author === 'vanya' ? '♂ Ваня' : '♀ Настя'}</span>
+                        <p>${msg.text}</p>
+                    </div>
+                `;
+                container.appendChild(msgEl);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // --- ROULETTE & QUESTS LOGIC ---
+        function spinRoulette() {
+            const btn = document.getElementById('btnSpin');
+            btn.disabled = true;
+
+            let count = 0;
+            const interval = setInterval(() => {
+                document.getElementById('reelWhere').innerText = ROULETTE_DATA.where[Math.floor(Math.random() * ROULETTE_DATA.where.length)];
+                document.getElementById('reelHow').innerText = ROULETTE_DATA.how[Math.floor(Math.random() * ROULETTE_DATA.how.length)];
+                document.getElementById('reelAction').innerText = ROULETTE_DATA.action[Math.floor(Math.random() * ROULETTE_DATA.action.length)];
+                count++;
+
+                if (count > 20) {
+                    clearInterval(interval);
+                    btn.disabled = false;
+                    triggerConfetti();
+                }
+            }, 80);
+        }
+
+        function renderQuests() {
+            const container = document.getElementById('questsContainer');
+            container.innerHTML = '';
+
+            appData.quests.forEach(quest => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-xl p-3 flex justify-between items-center border border-white/10';
+
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-xs text-white">${quest.title}</span>
+                            <span class="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300">${quest.level}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">${quest.desc}</p>
+                    </div>
+                    <button onclick="toggleQuest(${quest.id})" class="px-3 py-1 rounded-xl text-xs font-bold ${quest.done ? 'bg-green-600 text-white' : 'bg-neonPink text-white'} shadow-neon">
+                        ${quest.done ? '✅' : 'Сделать'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleQuest(id) {
+            const quest = appData.quests.find(q => q.id === id);
+            if (quest) {
+                quest.done = !quest.done;
+                if (quest.done) triggerConfetti();
+                saveData();
+                renderQuests();
+            }
+        }
+
+        // --- FANTASIES MATCHER LOGIC ---
+        function renderFantasies() {
+            const container = document.getElementById('fantasiesContainer');
+            container.innerHTML = '';
+
+            FANTASIES_LIST.forEach((fantasy, idx) => {
+                const answers = appData.fantasies[idx] || {};
+                const vanyaAns = answers.vanya;
+                const nastyaAns = answers.nastya;
+
+                // Match condition: Both chose positive
+                const isMatch = (vanyaAns === 'want' || vanyaAns === 'ready') && (nastyaAns === 'want' || nastyaAns === 'ready');
+
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-xl p-3 border ${isMatch ? 'border-neonPink shadow-neon bg-pink-950/30' : 'border-white/10'}`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-white">${fantasy}</span>
+                        ${isMatch ? '<span class="text-[10px] font-black text-neonPink animate-pulse">🔥 СОВПАДЕНИЕ!</span>' : ''}
+                    </div>
+
+                    <div class="flex gap-1 text-[10px]">
+                        <button onclick="setFantasyChoice(${idx}, 'want')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'want' ? 'bg-neonPink text-white' : 'bg-black/40 text-gray-400'}">
+                            😍 Очень хочу
+                        </button>
+                        <button onclick="setFantasyChoice(${idx}, 'ready')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'ready' ? 'bg-purple-600 text-white' : 'bg-black/40 text-gray-400'}">
+                            😏 Готов(а)
+                        </button>
+                        <button onclick="setFantasyChoice(${idx}, 'no')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'no' ? 'bg-gray-700 text-white' : 'bg-black/40 text-gray-400'}">
+                            🙈 Табу
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function setFantasyChoice(index, choice) {
+            if (!appData.fantasies[index]) appData.fantasies[index] = {};
+            appData.fantasies[index][currentUser] = choice;
+
+            saveData();
+            renderFantasies();
+
+            // Confetti if matched
+            const answers = appData.fantasies[index];
+            if ((answers.vanya === 'want' || answers.vanya === 'ready') && (answers.nastya === 'want' || answers.nastya === 'ready')) {
+                triggerConfetti();
+            }
+        }
+
+        // --- SETTINGS MODAL ---
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function saveSettings() {
+            usernames.vanya = document.getElementById('inputUsernameVanya').value.trim() || 'tikhon_official';
+            usernames.nastya = document.getElementById('inputUsernameNastya').value.trim() || 'nastya';
+            saveData();
+            closeSettingsModal();
+        }
+
+        // --- UTILS ---
+        function triggerConfetti() {
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.7 },
+                colors: ['#ff0055', '#ff2a6d', '#9d00ff', '#ffb700']
+            });
+        }
+    </script>
+</body>
+</html>
+```
