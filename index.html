@@ -411,7 +411,7 @@
         </div>
     </div>
 
-    <!-- JS App Logic with Real Cloud Sync API -->
+    <!-- JS App Logic with Vercel Serverless Sync -->
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
             try {
@@ -490,19 +490,16 @@
             history: []
         };
 
-        // Публичный бэкенд для мгновенного обмена JSON между разными телефонами
-        const CLOUD_SYNC_URL = "https://jsonbin.org/vanya_nastya_love_app_data_v3";
-
         window.onload = function() {
             try {
                 loadLocalData();
                 checkDailyContent();
                 calculateDaysTogether();
                 renderAll();
-                pullFromCloud(); // Загружаем актуальные данные из облака при старте
+                pullFromCloud(); // Загружаем актуальные данные с сервера при старте
             } catch(e) {}
             
-            // Каждые 2.5 секунды скачиваем свежие данные из облака, чтобы видеть ответы друг друга
+            // Каждые 2.5 секунды опрашиваем твой сервер Vercel для мгновенного обновления на iPhone и Android
             setInterval(pullFromCloud, 2500);
         };
 
@@ -598,7 +595,7 @@
             updateUserUI();
         }
 
-        // Сохранение данных локально и отправка в публичное облако
+        // Сохранение данных локально и отправка на личный сервер Vercel (синхронизация для iPhone и Android)
         function saveData() {
             try {
                 const jsonStr = JSON.stringify(appData);
@@ -606,8 +603,7 @@
                 localStorage.setItem('love_usernames', JSON.stringify(usernames));
                 localStorage.setItem('love_current_role', currentUser);
                 
-                // Пуш на реальный публичный эндпоинт для связи с телефоном Насти
-                fetch(CLOUD_SYNC_URL, {
+                fetch('/api/sync', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: jsonStr
@@ -615,14 +611,13 @@
             } catch(e) {}
         }
 
-        // Получение данных из облака
+        // Получение данных с сервера Vercel
         function pullFromCloud() {
             try {
-                fetch(CLOUD_SYNC_URL)
+                fetch('/api/sync')
                     .then(res => res.json())
                     .then(cloudData => {
-                        if (cloudData && typeof cloudData === 'object') {
-                            // Если облачные данные отличаются от локальных — обновляем экран
+                        if (cloudData && typeof cloudData === 'object' && Object.keys(cloudData).length > 0) {
                             if (JSON.stringify(cloudData) !== JSON.stringify(appData)) {
                                 appData = cloudData;
                                 localStorage.setItem('love_app_data', JSON.stringify(appData));
@@ -630,17 +625,7 @@
                             }
                         }
                     })
-                    .catch(() => {
-                        // Резервный механизм через localStorage между вкладками/WebView
-                        const localSync = localStorage.getItem('love_app_data');
-                        if (localSync) {
-                            const parsed = JSON.parse(localSync);
-                            if (JSON.stringify(parsed) !== JSON.stringify(appData)) {
-                                appData = parsed;
-                                renderAll();
-                            }
-                        }
-                    });
+                    .catch(() => {});
             } catch(e) {}
         }
 
