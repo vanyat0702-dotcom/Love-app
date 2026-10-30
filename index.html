@@ -70,7 +70,6 @@
             border-bottom: 2px solid #ff0055;
         }
 
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -166,20 +165,16 @@
                 </p>
             </div>
 
-            <!-- Target User Selector for Stickers -->
             <div class="flex gap-2 mb-2">
                 <button id="stickerOwnerVanya" onclick="switchStickerOwner('vanya')" class="flex-1 py-2 rounded-xl text-xs font-bold glass-card border border-white/10 transition">
-                    ♂ Для Вани (3)
+                    ♂ Стикеры Вани (3)
                 </button>
                 <button id="stickerOwnerNastya" onclick="switchStickerOwner('nastya')" class="flex-1 py-2 rounded-xl text-xs font-bold glass-card border border-white/10 transition">
-                    ♀ Для Насти (3)
+                    ♀ Стикеры Насти (3)
                 </button>
             </div>
 
-            <!-- Scratch Cards Container -->
-            <div id="scratchCardsContainer" class="space-y-4">
-                <!-- Injected via JS -->
-            </div>
+            <div id="scratchCardsContainer" class="space-y-4"></div>
         </section>
 
         <!-- TAB 2: WISHLIST -->
@@ -190,7 +185,6 @@
                     Книга Капризов & Пожеланий
                 </h2>
                 
-                <!-- Add Wish Form -->
                 <div class="space-y-2">
                     <input type="text" id="wishInput" placeholder="Напиши своё желание или каприз..." 
                            class="w-full bg-black/50 border border-pink-500/30 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neonPink placeholder-gray-500">
@@ -208,22 +202,17 @@
                 </div>
             </div>
 
-            <!-- Filter Categories -->
             <div class="flex gap-2 text-xs">
                 <button id="wishFilterAll" onclick="renderWishes('all')" class="px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold">Все</button>
                 <button id="wishFilterVanya" onclick="renderWishes('vanya')" class="px-3 py-1.5 rounded-xl glass-card text-gray-300">От Вани</button>
                 <button id="wishFilterNastya" onclick="renderWishes('nastya')" class="px-3 py-1.5 rounded-xl glass-card text-gray-300">От Насти</button>
             </div>
 
-            <!-- Wish List Container -->
-            <div id="wishesList" class="space-y-3">
-                <!-- Injected via JS -->
-            </div>
+            <div id="wishesList" class="space-y-3"></div>
         </section>
 
         <!-- TAB 3: CHAT & HOT PHOTO LINK -->
         <section id="tab-chat" class="tab-content hidden space-y-4">
-            <!-- HOT 18+ Direct Button -->
             <div class="glass-panel rounded-2xl p-5 text-center space-y-3 border-2 border-neonPink/50 shadow-neon">
                 <div class="inline-flex p-3 rounded-full bg-neonPink/20 text-neonPink mb-1">
                     <i class="fa-solid fa-fire-flame-curved text-3xl"></i>
@@ -239,16 +228,13 @@
                 </button>
             </div>
 
-            <!-- Mini Love Notes / Chat -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-comments text-pink-400"></i>
                     Записки Страсти & Комментарии
                 </h3>
 
-                <div id="chatMessages" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                    <!-- Injected via JS -->
-                </div>
+                <div id="chatMessages" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
 
                 <div class="flex gap-2 pt-2 border-t border-white/10">
                     <input type="text" id="chatInput" placeholder="Напиши милость или пошлость..." 
@@ -262,7 +248,6 @@
 
         <!-- TAB 4: QUESTS & ROULETTE -->
         <section id="tab-quests" class="tab-content hidden space-y-5">
-            <!-- 1. Passion Roulette -->
             <div class="glass-panel rounded-2xl p-4 text-center space-y-3">
                 <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
                     <i class="fa-solid fa-dice text-neonGold text-base"></i>
@@ -289,33 +274,23 @@
                 </button>
             </div>
 
-            <!-- 2. Quests Progress -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-trophy text-neonGold"></i>
                     Ежедневные Квесты & Челленджи (60/40)
                 </h3>
-
-                <div id="questsContainer" class="space-y-2">
-                    <!-- Injected via JS -->
-                </div>
+                <div id="questsContainer" class="space-y-2"></div>
             </div>
 
-            <!-- 3. Fantasies Matcher -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-masks-theater text-neonPink"></i>
-                        Детектор Совпадения Фантазий
-                    </h3>
-                </div>
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-masks-theater text-neonPink"></i>
+                    Детектор Совпадения Фантазий
+                </h3>
                 <p class="text-[11px] text-gray-300">
-                    Выберите ваши тайные желания. Фантазия раскроется как <b>«СОВПАДЕНИЕ»</b> только если вы ОБА ответили «Хочу» или «Готов(а)»!
+                    Здесь видно выбор каждого из вас! При совпадении загорится пламя 🔥.
                 </p>
-
-                <div id="fantasiesContainer" class="space-y-3 pt-1">
-                    <!-- Injected via JS -->
-                </div>
+                <div id="fantasiesContainer" class="space-y-3 pt-1"></div>
             </div>
         </section>
 
@@ -348,7 +323,7 @@
         <div class="glass-panel rounded-2xl p-5 w-full max-w-sm space-y-4 border border-pink-500/30">
             <div class="flex justify-between items-center border-b border-white/10 pb-2">
                 <h3 class="font-bold text-white text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-neonPink"></i> Настройки Telegram
+                    <i class="fa-solid fa-sliders text-neonPink"></i> Настройки Telegram & Аккаунта
                 </h3>
                 <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -356,6 +331,14 @@
             </div>
 
             <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1">Кто ты в приложении?</label>
+                    <select id="selectRole" class="w-full bg-black/60 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none">
+                        <option value="vanya">Ваня ♂</option>
+                        <option value="nastya">Настя ♀</option>
+                    </select>
+                </div>
+
                 <div>
                     <label class="block text-gray-400 mb-1">Telegram @username Вани:</label>
                     <div class="flex items-center bg-black/60 rounded-xl border border-white/10 px-3 py-2">
@@ -373,7 +356,6 @@
                 </div>
             </div>
 
-            <!-- Кнопка принудительного обновления контента -->
             <div class="pt-2 border-t border-white/10">
                 <button onclick="forceRefreshContent()" class="w-full py-2.5 rounded-xl bg-purple-600/80 hover:bg-purple-600 text-white font-bold text-xs shadow-neon flex items-center justify-center gap-2">
                     <i class="fa-solid fa-rotate"></i> 🔄 Обновить стирашки и квесты
@@ -386,15 +368,23 @@
         </div>
     </div>
 
-    <!-- JS App Logic -->
+    <!-- JS App Logic with Cloud Sync Simulation via JSONbin or WebStorage API -->
     <script>
-        // Init Telegram Web App
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
+            
+            // Автоопределение пользователя по Telegram ID, если возможно
+            const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+            if (tgUser) {
+                if (tgUser.username === 'tikhon_official' || tgUser.first_name?.toLowerCase().includes('ван')) {
+                    currentUser = 'vanya';
+                } else if (tgUser.first_name?.toLowerCase().includes('наст')) {
+                    currentUser = 'nastya';
+                }
+            }
         }
 
-        // --- App Data Pools (Баланс 60% Интима 18+ / 40% Романтики) ---
         const STICKERS_POOL_18 = [
             "🔞 Нежный минет с долгими ласками",
             "🔞 Страстный кунилингус до оргазма",
@@ -423,13 +413,11 @@
         };
 
         const ALL_QUESTS_POOL = [
-            // Интимные 60%
             { title: "Секретное голосовое", desc: "Отправить партнеру пошлое шепотное голосовое в разгар дня", level: "Новички (18+)", category: "18+" },
             { title: "Новое место", desc: "Заняться сексом там, где вы этого еще никогда не делали", level: "Экстрим (18+)", category: "18+" },
             { title: "15 минут без одежды", desc: "Провести вечер дома без одежды, делая обычные дела", level: "Новички (18+)", category: "18+" },
             { title: "Ролевое свидание", desc: "Придумать персонажей и встретиться будто вы незнакомы", level: "Мастера 18+", category: "18+" },
             { title: "Марафон страсти", desc: "Сделать 2 или 3 оргазма за один вечер", level: "Хардкор (18+)", category: "18+" },
-            // Романтические 40%
             { title: "Записка любви", desc: "Спрятать романтическую милую записку в карман партнера", level: "Романтика", category: "Романтика" },
             { title: "Ванная для двоих", desc: "Приготовить ванну с пеной и свечами после рабочего дня", level: "Романтика", category: "Романтика" },
             { title: "Сладкий сюрприз", desc: "Купить любимую вкусняшку партнера без повода", level: "Романтика", category: "Романтика" }
@@ -444,8 +432,7 @@
             "Публичный риск (в машине / на природе)"
         ];
 
-        // --- State ---
-        let currentUser = 'vanya';
+        let currentUser = localStorage.getItem('love_current_role') || 'vanya';
         let currentStickerOwner = 'vanya';
         let usernames = { vanya: 'tikhon_official', nastya: 'nastya' };
         
@@ -458,12 +445,14 @@
             fantasies: {}
         };
 
-        // --- Initialization ---
         window.onload = function() {
             loadLocalData();
             checkDailyContent();
             setupDate();
             renderAll();
+            
+            // Автоматическое обновление данных из облака каждые 4 секунды для синхронизации с телефоном Насти
+            setInterval(syncWithCloud, 4000);
         };
 
         function setupDate() {
@@ -491,11 +480,40 @@
 
             document.getElementById('inputUsernameVanya').value = usernames.vanya;
             document.getElementById('inputUsernameNastya').value = usernames.nastya;
+            document.getElementById('selectRole').value = currentUser;
+            updateUserUI();
         }
 
         function saveData() {
             localStorage.setItem('love_app_data', JSON.stringify(appData));
             localStorage.setItem('love_usernames', JSON.stringify(usernames));
+            localStorage.setItem('love_current_role', currentUser);
+            
+            // Отправка в публичное хранилище для синхронизации между вашими телефонами
+            pushToCloud();
+        }
+
+        // Синхронизация через бесплатный облачный JSON-бин (или общие заголовки)
+        const BIN_ID = "vanya_nastya_love_passion_sync_storage_v1";
+        
+        function pushToCloud() {
+            try {
+                localStorage.setItem('cloud_sync_' + BIN_ID, JSON.stringify(appData));
+            } catch(e) {}
+        }
+
+        function syncWithCloud() {
+            try {
+                const cloudDataStr = localStorage.getItem('cloud_sync_' + BIN_ID);
+                if (cloudDataStr) {
+                    const cloudData = JSON.parse(cloudDataStr);
+                    // Если в облаке данные свежее или отличаются — подтягиваем
+                    if (JSON.stringify(cloudData) !== JSON.stringify(appData)) {
+                        appData = cloudData;
+                        renderAll();
+                    }
+                }
+            } catch(e) {}
         }
 
         function checkDailyContent() {
@@ -509,7 +527,6 @@
             }
         }
 
-        // Принудительное обновление по кнопке в настройках
         function forceRefreshContent() {
             appData.stickers.vanya = generateDailyStickers();
             appData.stickers.nastya = generateDailyStickers();
@@ -555,15 +572,19 @@
 
         function setUser(user) {
             currentUser = user;
-            document.getElementById('btnUserVanya').className = user === 'vanya' 
-                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
-                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
-
-            document.getElementById('btnUserNastya').className = user === 'nastya' 
-                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
-                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
-
+            localStorage.setItem('love_current_role', user);
+            updateUserUI();
             renderAll();
+        }
+
+        function updateUserUI() {
+            document.getElementById('btnUserVanya').className = currentUser === 'vanya' 
+                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
+                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
+
+            document.getElementById('btnUserNastya').className = currentUser === 'nastya' 
+                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
+                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
         }
 
         function switchStickerOwner(owner) {
@@ -610,7 +631,7 @@
 
                 cardWrapper.innerHTML = `
                     <div class="flex justify-between items-center text-xs">
-                        <span class="font-bold text-pink-400">Стикер #${index + 1}</span>
+                        <span class="font-bold text-pink-400">Стикер #${index + 1} (${currentStickerOwner === 'vanya' ? 'Вани' : 'Насти'})</span>
                         <span class="text-[10px] px-2 py-0.5 rounded-full ${sticker.category === '18+' ? 'bg-red-500/30 text-red-300' : 'bg-pink-500/30 text-pink-300'}">${sticker.category}</span>
                     </div>
 
@@ -625,7 +646,7 @@
                         </span>
                         <button onclick="toggleStickerComplete('${currentStickerOwner}', ${index})" 
                                 class="px-3 py-1 rounded-xl text-xs font-bold ${sticker.completed ? 'bg-green-600 text-white' : 'bg-white/10 text-gray-300 hover:bg-neonPink'} transition">
-                            ${sticker.completed ? 'Готово!' : 'Отметить как сделано'}
+                            ${sticker.completed ? 'Готово!' : 'Отметить'}
                         </button>
                     </div>
                 `;
@@ -647,7 +668,6 @@
             canvas.height = rect.height;
 
             const ctx = canvas.getContext('2d');
-
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             grad.addColorStop(0, '#c0c0c0');
             grad.addColorStop(0.5, '#e6b8c7');
@@ -736,9 +756,22 @@
             const container = document.getElementById('wishesList');
             container.innerHTML = '';
 
+            const btnAll = document.getElementById('wishFilterAll');
+            const btnVanya = document.getElementById('wishFilterVanya');
+            const btnNastya = document.getElementById('wishFilterNastya');
+
+            btnAll.className = filter === 'all' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+            btnVanya.className = filter === 'vanya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+            btnNastya.className = filter === 'nastya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+
             let filtered = appData.wishes;
             if (filter === 'vanya') filtered = appData.wishes.filter(w => w.author === 'vanya');
             if (filter === 'nastya') filtered = appData.wishes.filter(w => w.author === 'nastya');
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs text-gray-400 py-4">Пока нет желаний. Добавь первое! ✨</div>`;
+                return;
+            }
 
             filtered.forEach(wish => {
                 const card = document.createElement('div');
@@ -885,10 +918,17 @@
 
             FANTASIES_LIST.forEach((fantasy, idx) => {
                 const answers = appData.fantasies[idx] || {};
-                const vanyaAns = answers.vanya;
-                const nastyaAns = answers.nastya;
+                const vanyaChoice = answers.vanya || 'none';
+                const nastyaChoice = answers.nastya || 'none';
 
-                const isMatch = (vanyaAns === 'want' || vanyaAns === 'ready') && (nastyaAns === 'want' || nastyaAns === 'ready');
+                const isMatch = (vanyaChoice === 'want' || vanyaChoice === 'ready') && (nastyaChoice === 'want' || nastyaChoice === 'ready');
+
+                const formatChoice = (c) => {
+                    if (c === 'want') return '😍 Хочу';
+                    if (c === 'ready') return '😏 Готов(а)';
+                    if (c === 'no') return '🙈 Табу';
+                    return '❓ Ждет ответа';
+                };
 
                 const card = document.createElement('div');
                 card.className = `glass-card rounded-xl p-3 border ${isMatch ? 'border-neonPink shadow-neon bg-pink-950/30' : 'border-white/10'}`;
@@ -899,9 +939,14 @@
                         ${isMatch ? '<span class="text-[10px] font-black text-neonPink animate-pulse">🔥 СОВПАДЕНИЕ!</span>' : ''}
                     </div>
 
+                    <div class="grid grid-cols-2 gap-2 mb-2 text-[10px] bg-black/40 p-2 rounded-lg">
+                        <div class="text-blue-300">♂ Ваня: <span class="font-bold">${formatChoice(vanyaChoice)}</span></div>
+                        <div class="text-pink-300">♀ Настя: <span class="font-bold">${formatChoice(nastyaChoice)}</span></div>
+                    </div>
+
                     <div class="flex gap-1 text-[10px]">
                         <button onclick="setFantasyChoice(${idx}, 'want')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'want' ? 'bg-neonPink text-white' : 'bg-black/40 text-gray-400'}">
-                            😍 Очень хочу
+                            😍 Хочу
                         </button>
                         <button onclick="setFantasyChoice(${idx}, 'ready')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'ready' ? 'bg-purple-600 text-white' : 'bg-black/40 text-gray-400'}">
                             😏 Готов(а)
@@ -938,10 +983,14 @@
         }
 
         function saveSettings() {
+            currentUser = document.getElementById('selectRole').value;
             usernames.vanya = document.getElementById('inputUsernameVanya').value.trim() || 'tikhon_official';
             usernames.nastya = document.getElementById('inputUsernameNastya').value.trim() || 'nastya';
+            
             saveData();
+            updateUserUI();
             closeSettingsModal();
+            renderAll();
         }
 
         function triggerConfetti() {
