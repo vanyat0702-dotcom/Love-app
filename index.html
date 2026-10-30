@@ -101,14 +101,6 @@
             cursor: pointer;
         }
 
-        .slot-machine {
-            perspective: 1000px;
-        }
-
-        .slot-reel {
-            transition: transform 3s cubic-bezier(0.15, 0.85, 0.35, 1.2);
-        }
-
         @keyframes pulseGlow {
             0%, 100% { opacity: 0.4; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.05); }
@@ -381,6 +373,13 @@
                 </div>
             </div>
 
+            <!-- Кнопка принудительного обновления контента -->
+            <div class="pt-2 border-t border-white/10">
+                <button onclick="forceRefreshContent()" class="w-full py-2.5 rounded-xl bg-purple-600/80 hover:bg-purple-600 text-white font-bold text-xs shadow-neon flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> 🔄 Обновить стирашки и квесты
+                </button>
+            </div>
+
             <button onclick="saveSettings()" class="w-full py-2.5 rounded-xl bg-neonPink text-white font-bold text-xs shadow-neon">
                 Сохранить настройки
             </button>
@@ -446,7 +445,7 @@
         ];
 
         // --- State ---
-        let currentUser = 'vanya'; // 'vanya' | 'nastya'
+        let currentUser = 'vanya';
         let currentStickerOwner = 'vanya';
         let usernames = { vanya: 'tikhon_official', nastya: 'nastya' };
         
@@ -499,21 +498,26 @@
             localStorage.setItem('love_usernames', JSON.stringify(usernames));
         }
 
-        // Автоматическая генерация контента на каждый день (60/40)
         function checkDailyContent() {
             const todayStr = new Date().toDateString();
             if (appData.lastDate !== todayStr || !appData.stickers.vanya.length || !appData.quests.length) {
                 appData.lastDate = todayStr;
-                
-                // Генерация стирашек (2 интим + 1 романтика = 60/40)
                 appData.stickers.vanya = generateDailyStickers();
                 appData.stickers.nastya = generateDailyStickers();
-                
-                // Генерация квестов (3 интим + 2 романтика = 60/40)
                 appData.quests = generateDailyQuests();
-
                 saveData();
             }
+        }
+
+        // Принудительное обновление по кнопке в настройках
+        function forceRefreshContent() {
+            appData.stickers.vanya = generateDailyStickers();
+            appData.stickers.nastya = generateDailyStickers();
+            appData.quests = generateDailyQuests();
+            saveData();
+            renderAll();
+            closeSettingsModal();
+            triggerConfetti();
         }
 
         function generateDailyStickers() {
@@ -549,7 +553,6 @@
             }));
         }
 
-        // --- User Switching ---
         function setUser(user) {
             currentUser = user;
             document.getElementById('btnUserVanya').className = user === 'vanya' 
@@ -568,7 +571,6 @@
             renderStickers();
         }
 
-        // --- Tab Switching ---
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
@@ -577,7 +579,6 @@
             document.getElementById(`nav-${tabName}`).classList.add('active-tab');
         }
 
-        // --- Render All Sections ---
         function renderAll() {
             renderStickers();
             renderWishes('all');
@@ -586,7 +587,6 @@
             renderFantasies();
         }
 
-        // --- STICKERS SCRATCH CARD LOGIC ---
         function renderStickers() {
             const container = document.getElementById('scratchCardsContainer');
             container.innerHTML = '';
@@ -711,7 +711,6 @@
             renderStickers();
         }
 
-        // --- WISHES LOGIC ---
         function addWish() {
             const input = document.getElementById('wishInput');
             const category = document.getElementById('wishCategory').value;
@@ -779,7 +778,6 @@
             renderWishes('all');
         }
 
-        // --- CHAT & HOT 18+ PHOTO LOGIC ---
         function sendHotPhotoToTG() {
             const recipientUser = currentUser === 'vanya' ? usernames.nastya : usernames.vanya;
             const text = encodeURIComponent("🔥 Малыш, у меня для тебя кое-что очень горячее... Лови 18+ фото!");
@@ -828,7 +826,6 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // --- ROULETTE & QUESTS LOGIC ---
         function spinRoulette() {
             const btn = document.getElementById('btnSpin');
             btn.disabled = true;
@@ -882,7 +879,6 @@
             }
         }
 
-        // --- FANTASIES MATCHER LOGIC ---
         function renderFantasies() {
             const container = document.getElementById('fantasiesContainer');
             container.innerHTML = '';
@@ -933,7 +929,6 @@
             }
         }
 
-        // --- SETTINGS MODAL ---
         function openSettingsModal() {
             document.getElementById('settingsModal').classList.remove('hidden');
         }
@@ -949,7 +944,6 @@
             closeSettingsModal();
         }
 
-        // --- UTILS ---
         function triggerConfetti() {
             confetti({
                 particleCount: 50,
