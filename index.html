@@ -1,933 +1,739 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Love & Passion 18+</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Canvas Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        velvet: '#0a050d',
-                        cardBg: 'rgba(25, 10, 28, 0.75)',
-                        neonPink: '#ff0055',
-                        neonPurple: '#9d00ff',
-                        neonGold: '#ffb700',
-                        hotRose: '#ff2a6d'
-                    },
-                    boxShadow: {
-                        'neon': '0 0 15px rgba(255, 0, 85, 0.4), 0 0 30px rgba(157, 0, 255, 0.2)',
-                        'neon-gold': '0 0 15px rgba(255, 183, 0, 0.5)',
-                        'glow': '0 0 20px rgba(255, 42, 109, 0.6)'
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
+        :root {
+            --bg-color: #0a050d;
+            --card-bg: rgba(25, 13, 26, 0.7);
+            --primary: #ff0055;
+            --accent: #ff2a6d;
+            --text: #f9f9f9;
+            --text-secondary: #b3a4b8;
+            --border: rgba(255, 0, 85, 0.3);
+            --shadow: 0 8px 32px rgba(255, 0, 85, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            background-color: #0a050d;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(255, 0, 85, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(157, 0, 255, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(10, 5, 13, 0.95) 0%, #0a050d 100%);
-            color: #f3e8ee;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
             min-height: 100vh;
-            user-select: none;
-            -webkit-user-select: none;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 85, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 40%);
         }
 
-        .glass-panel {
-            background: rgba(25, 12, 30, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 0, 85, 0.2);
+        header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 5, 13, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .glass-card {
-            background: rgba(35, 15, 42, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .profile-switch {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 3px;
+            border: 1px solid var(--border);
         }
 
-        .active-tab {
-            color: #ff0055;
-            text-shadow: 0 0 10px rgba(255, 0, 85, 0.8);
-            border-bottom: 2px solid #ff0055;
+        .profile-btn {
+            padding: 6px 14px;
+            border-radius: 17px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
+        .profile-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4);
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(10, 5, 13, 0.5);
+
+        .settings-icon {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 0, 85, 0.4);
-            border-radius: 4px;
+
+        .container {
+            flex: 1;
+            padding: 16px 16px 90px 16px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #fff, #ff8da1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* КАРТОЧКИ И СТИРАШКИ */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
         }
 
         .scratch-container {
             position: relative;
             width: 100%;
-            height: 140px;
-            border-radius: 1rem;
+            height: 110px;
+            border-radius: 12px;
             overflow: hidden;
+            background: linear-gradient(135deg, #1f0b1a, #2a1125);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px dashed rgba(255, 0, 85, 0.4);
+            cursor: pointer;
         }
 
-        .scratch-canvas {
+        .scratch-text {
+            font-size: 15px;
+            font-weight: 600;
+            padding: 0 15px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+        }
+
+        canvas.scratch-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 10;
             touch-action: none;
+            cursor: grab;
+        }
+
+        /* НАВИГАЦИЯ (НИЖНЯЯ ПАНЕЛЬ) */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 5, 13, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.2s;
+            flex: 1;
+        }
+
+        .nav-item span.icon {
+            font-size: 20px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+        }
+
+        /* КНОПКА ФОТО 18+ */
+        .btn-hot {
+            width: 100%;
+            background: linear-gradient(135deg, #ff0055, #8a2be2);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 0, 85, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            transition: transform 0.2s;
+        }
+        .btn-hot:active { transform: scale(0.97); }
+
+        /* ВИШЛИСТ / ПОЖЕЛАНИЯ */
+        .wish-input-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .wish-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 18px;
+            border-radius: 12px;
+            font-weight: bold;
             cursor: pointer;
         }
 
-        .slot-machine {
-            perspective: 1000px;
+        .wish-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.03);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .slot-reel {
-            transition: transform 3s cubic-bezier(0.15, 0.85, 0.35, 1.2);
+        .wish-item.done span {
+            text-decoration: line-through;
+            color: var(--text-secondary);
         }
 
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
+        /* ЧАТ */
+        .chat-messages {
+            height: 320px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+            margin-bottom: 12px;
         }
 
-        .pulse-bg {
-            animation: pulseGlow 4s infinite ease-in-out;
+        .chat-msg {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .chat-msg.vanya {
+            background: rgba(255, 0, 85, 0.15);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            align-self: flex-start;
+        }
+
+        .chat-msg.nastya {
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            align-self: flex-end;
+        }
+
+        /* МОДАЛКА НАСТРОЕК */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal.open { display: flex; }
+        .modal-content {
+            background: #14081c;
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 320px;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 15px 0;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
         }
     </style>
 </head>
-<body class="pb-24">
+<body>
 
-    <!-- Ambient Sparkles Background -->
-    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-neonPink/10 rounded-full blur-3xl pulse-bg"></div>
-        <div class="absolute bottom-1/3 right-1/4 w-80 h-80 bg-neonPurple/10 rounded-full blur-3xl pulse-bg" style="animation-delay: 2s;"></div>
+<header>
+    <div class="profile-switch">
+        <button class="profile-btn active" id="btn-vanya" onclick="setProfile('vanya')">Ваня ♂</button>
+        <button class="profile-btn" id="btn-nastya" onclick="setProfile('nastya')">Настя ♀</button>
+    </div>
+    <button class="settings-icon" onclick="openSettings()">⚙️</button>
+</header>
+
+<div class="container">
+    <!-- ВКЛАДКА 1: СТИРАШКИ -->
+    <div id="tab-scratch" class="tab-content active">
+        <h2>🎴 Ежедневные Стирашки</h2>
+        <div class="subtitle" id="subtitle-profile">Обновляется каждый день! 60% пошлости + 40% романтики ✨</div>
+
+        <div style="margin-bottom: 10px; font-weight: bold; color: var(--accent);">🔥 Твои 3 стикера на сегодня:</div>
+        <div id="my-scratch-cards"></div>
+
+        <div style="margin: 20px 0 10px 0; font-weight: bold; color: var(--text-secondary);">✨ Стикеры партнера:</div>
+        <div id="partner-scratch-cards"></div>
     </div>
 
-    <div class="relative z-10 max-w-md mx-auto px-4 pt-4">
+    <!-- ВКЛАДКА 2: ПОЖЕЛАНИЯ -->
+    <div id="tab-wishes" class="tab-content">
+        <h2>✨ Вишлист Желаний</h2>
+        <div class="subtitle">Пишите свои пошлые и романтичные капризы</div>
 
-        <!-- Header / User Switcher -->
-        <header class="glass-panel rounded-2xl p-3 mb-4 shadow-neon flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-neonPink to-neonPurple p-[2px] shadow-glow">
-                    <div class="w-full h-full bg-velvet rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-heart-fire text-neonPink text-lg"></i>
-                    </div>
-                </div>
-                <div>
-                    <h1 class="text-xs font-bold uppercase tracking-widest text-pink-300">Love & Passion 18+</h1>
-                    <p class="text-[10px] text-gray-400" id="currentDate">Сегодня: --.--.----</p>
-                </div>
+        <button class="btn-hot" onclick="sendPhotoToPartner()">🔥 Отправить фото 18+ в ЛС</button>
+
+        <div class="card">
+            <h3 style="font-size: 16px; margin-bottom: 10px;" id="wish-list-title">Желания Вани</h3>
+            <div class="wish-input-box">
+                <input type="text" id="new-wish-text" class="wish-input" placeholder="Например: хочу страстный массаж...">
+                <button class="btn-add" onclick="addWish()">+</button>
             </div>
-
-            <!-- Profile Selector Toggle -->
-            <div class="flex bg-black/40 p-1 rounded-xl border border-white/10">
-                <button id="btnUserVanya" onclick="setUser('vanya')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
-                    <i class="fa-solid fa-mars text-blue-400"></i> Ваня
-                </button>
-                <button id="btnUserNastya" onclick="setUser('nastya')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
-                    <i class="fa-solid fa-venus text-pink-400"></i> Настя
-                </button>
-            </div>
-
-            <!-- Settings Cog -->
-            <button onclick="openSettingsModal()" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition">
-                <i class="fa-solid fa-gear text-sm"></i>
-            </button>
-        </header>
-
-        <!-- Dynamic Content Tabs -->
-
-        <!-- TAB 1: STICKERS (SCRATCH CARDS) -->
-        <section id="tab-stickers" class="tab-content space-y-4">
-            <div class="glass-panel rounded-2xl p-4 text-center relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-16 h-16 bg-neonPink/20 rounded-full blur-xl"></div>
-                <h2 class="text-lg font-extrabold text-white flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-neonPink"></i>
-                    Дневные Тайные Стикеры
-                </h2>
-                <p class="text-xs text-gray-300 mt-1">
-                    Стриай серебристое покрытие пальцем, чтобы узнать своё секретное желание на сегодня!
-                </p>
-            </div>
-
-            <!-- Target User Selector for Stickers -->
-            <div class="flex gap-2 mb-2">
-                <button id="stickerOwnerVanya" onclick="switchStickerOwner('vanya')" class="flex-1 py-2 rounded-xl text-xs font-bold glass-card border border-white/10 transition">
-                    ♂ Для Вани (3)
-                </button>
-                <button id="stickerOwnerNastya" onclick="switchStickerOwner('nastya')" class="flex-1 py-2 rounded-xl text-xs font-bold glass-card border border-white/10 transition">
-                    ♀ Для Насти (3)
-                </button>
-            </div>
-
-            <!-- Scratch Cards Container -->
-            <div id="scratchCardsContainer" class="space-y-4">
-                <!-- Injected via JS -->
-            </div>
-        </section>
-
-        <!-- TAB 2: WISHLIST -->
-        <section id="tab-wishes" class="tab-content hidden space-y-4">
-            <div class="glass-panel rounded-2xl p-4">
-                <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-3">
-                    <i class="fa-solid fa-star text-neonGold"></i>
-                    Книга Капризов & Пожеланий
-                </h2>
-                
-                <!-- Add Wish Form -->
-                <div class="space-y-2">
-                    <input type="text" id="wishInput" placeholder="Напиши своё желание или каприз..." 
-                           class="w-full bg-black/50 border border-pink-500/30 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neonPink placeholder-gray-500">
-                    
-                    <div class="flex gap-2">
-                        <select id="wishCategory" class="bg-black/50 border border-pink-500/30 rounded-xl px-2 py-2 text-xs text-white focus:outline-none">
-                            <option value="18+">🔥 18+ Интимное</option>
-                            <option value="Романтика">💖 Романтика</option>
-                        </select>
-
-                        <button onclick="addWish()" class="flex-1 bg-gradient-to-r from-neonPink to-hotRose hover:opacity-90 font-bold text-xs py-2 rounded-xl text-white shadow-neon flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-plus"></i> Добавить
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filter Categories -->
-            <div class="flex gap-2 text-xs">
-                <button id="wishFilterAll" onclick="renderWishes('all')" class="px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold">Все</button>
-                <button id="wishFilterVanya" onclick="renderWishes('vanya')" class="px-3 py-1.5 rounded-xl glass-card text-gray-300">От Вани</button>
-                <button id="wishFilterNastya" onclick="renderWishes('nastya')" class="px-3 py-1.5 rounded-xl glass-card text-gray-300">От Насти</button>
-            </div>
-
-            <!-- Wish List Container -->
-            <div id="wishesList" class="space-y-3">
-                <!-- Injected via JS -->
-            </div>
-        </section>
-
-        <!-- TAB 3: CHAT & HOT PHOTO LINK -->
-        <section id="tab-chat" class="tab-content hidden space-y-4">
-            <!-- HOT 18+ Direct Button -->
-            <div class="glass-panel rounded-2xl p-5 text-center space-y-3 border-2 border-neonPink/50 shadow-neon">
-                <div class="inline-flex p-3 rounded-full bg-neonPink/20 text-neonPink mb-1">
-                    <i class="fa-solid fa-fire-flame-curved text-3xl"></i>
-                </div>
-                <h3 class="text-base font-extrabold text-white">Быстрая Интимная Связь</h3>
-                <p class="text-xs text-gray-300">
-                    Нажми кнопку ниже, чтобы моментально перейти в ЛС партнёра в Telegram и отправить горячие 18+ кадры!
-                </p>
-                
-                <button onclick="sendHotPhotoToTG()" class="w-full py-3 rounded-xl bg-gradient-to-r from-neonPink via-hotRose to-neonPurple text-white font-black text-sm tracking-wide shadow-glow transform active:scale-95 transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-camera-retro text-lg"></i>
-                    🔥 ОТПРАВИТЬ ФОТО 18+ В ЛС
-                </button>
-            </div>
-
-            <!-- Mini Love Notes / Chat -->
-            <div class="glass-panel rounded-2xl p-4 space-y-3">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-comments text-pink-400"></i>
-                    Записки Страсти & Комментарии
-                </h3>
-
-                <div id="chatMessages" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                    <!-- Injected via JS -->
-                </div>
-
-                <div class="flex gap-2 pt-2 border-t border-white/10">
-                    <input type="text" id="chatInput" placeholder="Напиши милость или пошлость..." 
-                           class="flex-1 bg-black/50 border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-neonPink">
-                    <button onclick="sendChatMessage()" class="bg-neonPink px-4 py-2 rounded-xl text-white text-xs font-bold hover:bg-hotRose">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 4: QUESTS & ROULETTE -->
-        <section id="tab-quests" class="tab-content hidden space-y-5">
-            <!-- 1. Passion Roulette -->
-            <div class="glass-panel rounded-2xl p-4 text-center space-y-3">
-                <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-dice text-neonGold text-base"></i>
-                    Рулетка Быстрой Страсти 18+
-                </h3>
-
-                <div class="grid grid-cols-3 gap-2 bg-black/60 p-2 rounded-xl border border-white/10 my-2 text-center text-xs">
-                    <div class="p-2 glass-card rounded-lg border-pink-500/20">
-                        <span class="text-[10px] text-gray-400 block mb-1">ГДЕ?</span>
-                        <span id="reelWhere" class="font-bold text-pink-300">❓</span>
-                    </div>
-                    <div class="p-2 glass-card rounded-lg border-purple-500/20">
-                        <span class="text-[10px] text-gray-400 block mb-1">КАК?</span>
-                        <span id="reelHow" class="font-bold text-purple-300">❓</span>
-                    </div>
-                    <div class="p-2 glass-card rounded-lg border-yellow-500/20">
-                        <span class="text-[10px] text-gray-400 block mb-1">ЧТО?</span>
-                        <span id="reelAction" class="font-bold text-yellow-300">❓</span>
-                    </div>
-                </div>
-
-                <button onclick="spinRoulette()" id="btnSpin" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-neonPurple to-neonPink font-bold text-xs text-white shadow-neon flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-rotate"></i> КРУТИТЬ КОЛЕСО СТРАСТИ
-                </button>
-            </div>
-
-            <!-- 2. Quests Progress -->
-            <div class="glass-panel rounded-2xl p-4 space-y-3">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-neonGold"></i>
-                    Квесты & Челленджи 18+
-                </h3>
-
-                <div id="questsContainer" class="space-y-2">
-                    <!-- Injected via JS -->
-                </div>
-            </div>
-
-            <!-- 3. Fantasies Matcher -->
-            <div class="glass-panel rounded-2xl p-4 space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-masks-theater text-neonPink"></i>
-                        Детектор Совпадения Фантазий
-                    </h3>
-                </div>
-                <p class="text-[11px] text-gray-300">
-                    Выберите ваши тайные желания. Фантазия раскроется как <b>«СОВПАДЕНИЕ»</b> только если вы ОБА ответили «Хочу» или «Готов(а)»!
-                </p>
-
-                <div id="fantasiesContainer" class="space-y-3 pt-1">
-                    <!-- Injected via JS -->
-                </div>
-            </div>
-        </section>
-
-    </div>
-
-    <!-- Navigation Bar -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-velvet/90 backdrop-blur-xl border-t border-pink-500/20 px-3 py-2">
-        <div class="max-w-md mx-auto grid grid-cols-4 gap-1">
-            <button onclick="switchTab('stickers')" id="nav-stickers" class="flex flex-col items-center justify-center py-1 text-xs font-medium text-gray-400 transition active-tab">
-                <i class="fa-solid fa-box-open text-base mb-1"></i>
-                <span class="text-[10px]">Стирашки</span>
-            </button>
-            <button onclick="switchTab('wishes')" id="nav-wishes" class="flex flex-col items-center justify-center py-1 text-xs font-medium text-gray-400 transition">
-                <i class="fa-solid fa-heart text-base mb-1"></i>
-                <span class="text-[10px]">Капризы</span>
-            </button>
-            <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center justify-center py-1 text-xs font-medium text-gray-400 transition">
-                <i class="fa-solid fa-fire text-base mb-1"></i>
-                <span class="text-[10px]">18+ ЛС</span>
-            </button>
-            <button onclick="switchTab('quests')" id="nav-quests" class="flex flex-col items-center justify-center py-1 text-xs font-medium text-gray-400 transition">
-                <i class="fa-solid fa-gamepad text-base mb-1"></i>
-                <span class="text-[10px]">Игры & Квесты</span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-panel rounded-2xl p-5 w-full max-w-sm space-y-4 border border-pink-500/30">
-            <div class="flex justify-between items-center border-b border-white/10 pb-2">
-                <h3 class="font-bold text-white text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-neonPink"></i> Настройки Telegram
-                </h3>
-                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-gray-400 mb-1">Telegram @username Вани:</label>
-                    <div class="flex items-center bg-black/60 rounded-xl border border-white/10 px-3 py-2">
-                        <span class="text-gray-500 mr-1">@</span>
-                        <input type="text" id="inputUsernameVanya" class="bg-transparent text-white w-full focus:outline-none" placeholder="tikhon_official">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-gray-400 mb-1">Telegram @username Насти:</label>
-                    <div class="flex items-center bg-black/60 rounded-xl border border-white/10 px-3 py-2">
-                        <span class="text-gray-500 mr-1">@</span>
-                        <input type="text" id="inputUsernameNastya" class="bg-transparent text-white w-full focus:outline-none" placeholder="nastya">
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="saveSettings()" class="w-full py-2.5 rounded-xl bg-neonPink text-white font-bold text-xs shadow-neon">
-                Сохранить настройки
-            </button>
+            <div id="wishes-container"></div>
         </div>
     </div>
 
-    <!-- JS App Logic -->
-    <script>
-        // Init Telegram Web App
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-        }
+    <!-- ВКЛАДКА 3: ЧАТ -->
+    <div id="tab-chat" class="tab-content">
+        <h2>💬 Интимный Чат</h2>
+        <div class="subtitle">Место для сладких и пошлых записок друг другу</div>
 
-        // --- App Data Pools ---
-        const STICKERS_POOL = [
-            { text: "🔞 Нежный минет с долгими ласками", category: "18+" },
-            { text: "🔞 Страстный кунилингус до оргазма", category: "18+" },
-            { text: "🔞 Секс в неожиданном месте квартиры", category: "18+" },
-            { text: "📸 Горячее фото 18+ прямо сейчас", category: "18+" },
-            { text: "📸 Фото 18+ на выбор партнера", category: "18+" },
-            { text: "🍿 Просмотр кино и обнимашки под пледом", category: "Романтика" },
-            { text: "🍳 Романтический завтрак в постель", category: "Романтика" },
-            { text: "🍷 Вкусный ужин при свечах", category: "Романтика" },
-            { text: "🌳 Вечерняя прогулка держась за руки", category: "Романтика" },
-            { text: "💆‍♂️ Эротический массаж всего тела с маслом", category: "18+" },
-            { text: "🔞 Быстрый и страстный секс (Быструш)", category: "18+" },
-            { text: "🎭 Ролевая игра с завязыванием глаз", category: "18+" },
-            { text: "👑 15 минут полного подчинения партнеру", category: "18+" },
-            { text: "🚿 Совместный горячий душ / ванная с пеной", category: "Романтика" }
-        ];
+        <button class="btn-hot" onclick="sendPhotoToPartner()">🔥 Отправить фото 18+ в ЛС</button>
 
-        const ROULETTE_DATA = {
-            where: ["На кухне", "В душе", "На диване", "На столе", "На полу", "В кровати", "У зеркала"],
-            how: ["Завязав глаза", "Очень медленно", "Очень страстно", "Без рук", "С использованием масла", "В полной темноте"],
-            action: ["Оральные ласки", "Эротический массаж", "Поцелуи везде", "Исполнить каприз", "Секс 18+", "Полежать в обнимку"]
-        };
+        <div class="card">
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="wish-input-box" style="margin-bottom: 0;">
+                <input type="text" id="chat-input" class="wish-input" placeholder="Напиши что-нибудь пошлое..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button class="btn-add" onclick="sendChatMessage()">➤</button>
+            </div>
+        </div>
+    </div>
 
-        const QUESTS_DATA = [
-            { id: 1, title: "Секретное голосовое", desc: "Отправить партнеру пошлое шепотное голосовое в разгар дня", level: "Новички", done: false },
-            { id: 2, title: "Новое место", desc: "Заняться сексом там, где вы этого еще никогда не делали", level: "Экстрим", done: false },
-            { id: 3, title: "15 минут без одежды", desc: "Провести вечер дома без одежды, делая обычные дела", level: "Новички", done: false },
-            { id: 4, title: "Ролевое свидание", desc: "Придумать персонажей и встретиться будто вы незнакомы", level: "Мастера 18+", done: false }
-        ];
+    <!-- ВКЛАДКА 4: ИГРЫ И КВЕСТЫ -->
+    <div id="tab-games" class="tab-content">
+        <h2>🎲 Рулетка & Квесты 18+</h2>
+        <div class="subtitle">60% пикантного огня и 40% нежности</div>
 
-        const FANTASIES_LIST = [
-            "Ролевая игра с костюмами",
-            "Связывание / легкое БДСМ",
-            "Секс перед большим зеркалом",
-            "Использование секс-игрушек",
-            "Интимный видеоархив для двоих",
-            "Публичный риск (в машине / на природе)"
-        ];
+        <div class="card" style="text-align: center;">
+            <h3 style="margin-bottom: 10px; color: var(--accent);">🎰 Рулетка Страсти</h3>
+            <div id="roulette-result" style="font-size: 15px; margin: 15px 0; min-height: 45px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px;">
+                Нажми кнопку, чтобы выпал горячий вызов!
+            </div>
+            <button class="btn-hot" onclick="spinRoulette()" style="margin-bottom: 0;">Крутить рулетку 😈</button>
+        </div>
 
-        // --- State ---
-        let currentUser = 'vanya'; // 'vanya' | 'nastya'
-        let currentStickerOwner = 'vanya';
-        let usernames = { vanya: 'tikhon_official', nastya: 'nastya' };
+        <div class="card">
+            <h3 style="margin-bottom: 10px; font-size: 16px;">🔥 Ежедневные Квесты пары</h3>
+            <div id="quests-container"></div>
+        </div>
+    </div>
+</div>
+
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
+<nav>
+    <button class="nav-item active" onclick="switchTab('scratch', this)">
+        <span class="icon">🎴</span>
+        <span>Стирашки</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('wishes', this)">
+        <span class="icon">✨</span>
+        <span>Пожелания</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('chat', this)">
+        <span class="icon">💬</span>
+        <span>Чат</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('games', this)">
+        <span class="icon">🎲</span>
+        <span>Квесты</span>
+    </button>
+</nav>
+
+<!-- МОДАЛКА НАСТРОЕК ТЕЛЕГРАМ -->
+<div class="modal" id="settings-modal">
+    <div class="modal-content">
+        <h3>⚙️ Настройка ТГ ЛС</h3>
+        <p style="font-size: 12px; color: var(--text-secondary); margin: 6px 0 12px 0;">Укажите Telegram username без @, чтобы кнопка фото открывала нужный чат.</p>
+        <label style="font-size: 12px;">Твой Username:</label>
+        <input type="text" id="my-tg" placeholder="например: vanya">
+        <label style="font-size: 12px;">Username партнера (Насти):</label>
+        <input type="text" id="partner-tg" placeholder="например: nastya">
+        <button class="btn-hot" onclick="saveSettings()" style="margin-top: 10px; margin-bottom: 0;">Сохранить</button>
+    </div>
+</div>
+
+<script>
+    let currentProfile = localStorage.getItem('love_profile') || 'vanya';
+    let tgUsernames = JSON.parse(localStorage.getItem('love_tg_users')) || { vanya: '', nastya: '' };
+
+    // База данных с балансом 60% пошлости (18+) и 40% романтики
+    const poolScratch = [
+        // Пошлость 60%
+        "🌶️ Интим в необычном месте квартиры (на полу/кухне)",
+        "🔥 Сделать страстный оральный ласк без прелюдий",
+        "😈 Доминирование: партнер выполняет любые приказы 10 минут",
+        "🥵 Использовать кубибики льда в самых чувствительных местах",
+        "💋 Интенсивный секс в позе сзади до полного изнеможения",
+        "🔥 Эротический массаж согреющим маслом с акцентом на бедра",
+        "🌶️ Острая ролевая игра: незнакомцы в отеле",
+        "😈 Раздеться полностью и выполнить танец соблазнения",
+        // Романтика 40%
+        "💖 Ужин при свечах и нежные поцелуи под пледом",
+        "✨ Медленный романтичный танец под любимую песню вдвоем",
+        "🌹 Сказать 10 искренних комплиментов глядя прямо в глаза",
+        "💌 Написать от руки нежное признание и спрятать в карман"
+    ];
+
+    const roulettePool = [
+        "🌶️ Где: На кухонном столе | Как: Медленно | Что: Страстный оральный ласк",
+        "🔥 Где: В ванной под душем | Как: Стоя | Что: Жаркие поцелуи и проникновение",
+        "💋 Где: В спальне на постели | Как: С завязанными глазами | Что: Полное доминирование",
+        "✨ Где: На диване в гостиной | Как: В позе сзади | Что: Страстный экспресс-секс",
+        "💖 Где: На полу на ковре | Как: Нежно и чувственно | Что: Долгие ласки и объятия"
+    ];
+
+    const defaultQuestsPool = [
+        { text: "🔥 Отправить пикантное фото 18+ посреди рабочего дня", done: false },
+        { text: "🌶️ Ночной марафон на 3 горячие позиции подряд", done: false },
+        { text: "✨ Сделать расслабляющий массаж плеч и спины вечером", done: false },
+        { text: "💖 Сказать нежные слова любви перед сном", done: false }
+    ];
+
+    function getTodayString() {
+        const d = new Date();
+        return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    }
+
+    function initApp() {
+        document.getElementById('btn-vanya').classList.toggle('active', currentProfile === 'vanya');
+        document.getElementById('btn-nastya').classList.toggle('active', currentProfile === 'nastya');
         
-        let appData = {
-            lastDate: '',
-            stickers: { vanya: [], nastya: [] },
-            wishes: [],
-            chat: [],
-            quests: QUESTS_DATA,
-            fantasies: {} // { fantasyIndex: { vanya: 'want', nastya: 'ready' } }
-        };
+        loadDailyContent();
+        loadWishes();
+        loadChat();
+        loadQuests();
+    }
 
-        // --- Initialization ---
-        window.onload = function() {
-            loadLocalData();
-            checkDailyStickers();
-            setupDate();
-            renderAll();
-        };
+    function setProfile(profile) {
+        currentProfile = profile;
+        localStorage.setItem('love_profile', profile);
+        initApp();
+    }
 
-        function setupDate() {
-            const today = new Date();
-            const dateStr = today.toLocaleDateString('ru-RU');
-            document.getElementById('currentDate').innerText = `Сегодня: ${dateStr}`;
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+        el.classList.add('active');
+    }
+
+    // ГЕНЕРАЦИЯ ЕЖЕДНЕВНОГО КОНТЕНТА (60/40)
+    function loadDailyContent() {
+        const today = getTodayString();
+        const myContainer = document.getElementById('my-scratch-cards');
+        const partnerContainer = document.getElementById('partner-scratch-cards');
+        myContainer.innerHTML = '';
+        partnerContainer.innerHTML = '';
+
+        let storedDate = localStorage.getItem('love_date');
+        let myCards = JSON.parse(localStorage.getItem(`scratch_${currentProfile}`));
+        let partnerKey = currentProfile === 'vanya' ? 'nastya' : 'vanya';
+        let partnerCards = JSON.parse(localStorage.getItem(`scratch_${partnerKey}`));
+
+        // Если наступил новый день — генерируем новые рандомные стирашки
+        if (storedDate !== today || !myCards || !partnerCards) {
+            let shuffled = [...poolScratch].sort(() => 0.5 - Math.random());
+            myCards = [shuffled[0], shuffled[1], shuffled[2]];
+            
+            let shuffledPartner = [...poolScratch].sort(() => 0.5 - Math.random());
+            partnerCards = [shuffledPartner[0], shuffledPartner[1], shuffledPartner[2]];
+
+            localStorage.setItem('love_date', today);
+            localStorage.setItem(`scratch_vanya`, JSON.stringify(currentProfile === 'vanya' ? myCards : partnerCards));
+            localStorage.setItem(`scratch_nastya`, JSON.stringify(currentProfile === 'nastya' ? myCards : partnerCards));
         }
 
-        function loadLocalData() {
-            const savedUsernames = localStorage.getItem('love_usernames');
-            if (savedUsernames) usernames = JSON.parse(savedUsernames);
+        let currentMyCards = JSON.parse(localStorage.getItem(`scratch_${currentProfile}`));
+        let currentPartnerCards = JSON.parse(localStorage.getItem(`scratch_${partnerKey}`));
 
-            const savedData = localStorage.getItem('love_app_data');
-            if (savedData) {
-                appData = JSON.parse(savedData);
-            } else {
-                // Initial Default Wishes
-                appData.wishes = [
-                    { id: 1, text: "Хочу расслабляющий массаж спины", category: "Романтика", author: "nastya", done: false },
-                    { id: 2, text: "Хочу горячее фото 18+ в кружевном белье", category: "18+", author: "vanya", done: false }
-                ];
-                appData.chat = [
-                    { author: 'vanya', text: "Жду вечера, малышка! ❤️" }
-                ];
-            }
+        currentMyCards.forEach((text, index) => {
+            myContainer.appendChild(createScratchCardElement(text, index, true));
+        });
 
-            document.getElementById('inputUsernameVanya').value = usernames.vanya;
-            document.getElementById('inputUsernameNastya').value = usernames.nastya;
+        currentPartnerCards.forEach((text, index) => {
+            partnerContainer.appendChild(createScratchCardElement(text, index, false));
+        });
+    }
+
+    function createScratchCardElement(text, index, isMine) {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.padding = '0';
+        div.style.overflow = 'hidden';
+        div.style.marginBottom = '10px';
+
+        const scratchDiv = document.createElement('div');
+        scratchDiv.className = 'scratch-container';
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'scratch-text';
+        textDiv.innerText = text;
+        scratchDiv.appendChild(textDiv);
+
+        if (isMine) {
+            const canvas = document.createElement('canvas');
+            canvas.className = 'scratch-canvas';
+            scratchDiv.appendChild(canvas);
+            initCanvas(canvas);
+        } else {
+            const overlay = document.createElement('div');
+            overlay.style.position = 'absolute';
+            overlay.style.inset = '0';
+            overlay.style.background = 'linear-gradient(135deg, #2a1125, #3a1935)';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.color = '#ff8da1';
+            overlay.style.fontSize = '13px';
+            overlay.innerText = '🔒 Стирает партнер';
+            scratchDiv.appendChild(overlay);
         }
 
-        function saveData() {
-            localStorage.setItem('love_app_data', JSON.stringify(appData));
-            localStorage.setItem('love_usernames', JSON.stringify(usernames));
-        }
+        div.appendChild(scratchDiv);
+        return div;
+    }
 
-        // Check if day changed & generate random stickers
-        function checkDailyStickers() {
-            const todayStr = new Date().toDateString();
-            if (appData.lastDate !== todayStr) {
-                appData.lastDate = todayStr;
-                appData.stickers.vanya = getRandomStickers(3);
-                appData.stickers.nastya = getRandomStickers(3);
-                saveData();
-            }
-        }
+    function initCanvas(canvas) {
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
 
-        function getRandomStickers(count) {
-            const shuffled = [...STICKERS_POOL].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count).map((item, idx) => ({
-                id: idx,
-                text: item.text,
-                category: item.category,
-                scratched: false,
-                completed: false
-            }));
-        }
-
-        // --- User Switching ---
-        function setUser(user) {
-            currentUser = user;
-            document.getElementById('btnUserVanya').className = user === 'vanya' 
-                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
-                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
-
-            document.getElementById('btnUserNastya').className = user === 'nastya' 
-                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
-                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
-
-            renderAll();
-        }
-
-        function switchStickerOwner(owner) {
-            currentStickerOwner = owner;
-            renderStickers();
-        }
-
-        // --- Tab Switching ---
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-
-            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active-tab'));
-            document.getElementById(`nav-${tabName}`).classList.add('active-tab');
-        }
-
-        // --- Render All Sections ---
-        function renderAll() {
-            renderStickers();
-            renderWishes('all');
-            renderChat();
-            renderQuests();
-            renderFantasies();
-        }
-
-        // --- STICKERS SCRATCH CARD LOGIC ---
-        function renderStickers() {
-            const container = document.getElementById('scratchCardsContainer');
-            container.innerHTML = '';
-
-            const ownerVanyaBtn = document.getElementById('stickerOwnerVanya');
-            const ownerNastyaBtn = document.getElementById('stickerOwnerNastya');
-
-            if (currentStickerOwner === 'vanya') {
-                ownerVanyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-neonPink text-white shadow-neon';
-                ownerNastyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold glass-card text-gray-400';
-            } else {
-                ownerNastyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-neonPink text-white shadow-neon';
-                ownerVanyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold glass-card text-gray-400';
-            }
-
-            const stickers = appData.stickers[currentStickerOwner] || [];
-
-            stickers.forEach((sticker, index) => {
-                const cardWrapper = document.createElement('div');
-                cardWrapper.className = 'glass-card rounded-2xl p-3 relative space-y-2 border border-pink-500/20';
-
-                cardWrapper.innerHTML = `
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="font-bold text-pink-400">Стикер #${index + 1}</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full ${sticker.category === '18+' ? 'bg-red-500/30 text-red-300' : 'bg-pink-500/30 text-pink-300'}">${sticker.category}</span>
-                    </div>
-
-                    <div class="scratch-container flex items-center justify-center p-4 text-center bg-black/40 rounded-xl border border-white/5">
-                        <p class="text-sm font-extrabold text-white">${sticker.text}</p>
-                        <canvas id="canvas-${currentStickerOwner}-${index}" class="scratch-canvas ${sticker.scratched ? 'hidden' : ''}"></canvas>
-                    </div>
-
-                    <div class="flex justify-between items-center pt-1">
-                        <span class="text-[11px] text-gray-400">
-                            ${sticker.completed ? '✅ Исполнено!' : (sticker.scratched ? '🔓 Стерто' : '🔒 Зашифровано')}
-                        </span>
-                        <button onclick="toggleStickerComplete('${currentStickerOwner}', ${index})" 
-                                class="px-3 py-1 rounded-xl text-xs font-bold ${sticker.completed ? 'bg-green-600 text-white' : 'bg-white/10 text-gray-300 hover:bg-neonPink'} transition">
-                            ${sticker.completed ? 'Готово!' : 'Отметить как сделано'}
-                        </button>
-                    </div>
-                `;
-
-                container.appendChild(cardWrapper);
-
-                if (!sticker.scratched) {
-                    setTimeout(() => initScratchCanvas(`canvas-${currentStickerOwner}-${index}`, currentStickerOwner, index), 50);
-                }
-            });
-        }
-
-        function initScratchCanvas(canvasId, owner, index) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-
-            const ctx = canvas.getContext('2d');
-
-            // Scratch Foil Fill
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#c0c0c0');
-            grad.addColorStop(0.5, '#e6b8c7');
-            grad.addColorStop(1, '#8a8a8a');
-            ctx.fillStyle = grad;
+        setTimeout(() => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.fillStyle = '#ff0055';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Text on Foil
-            ctx.fillStyle = '#4a0e2e';
-            ctx.font = 'bold 12px sans-serif';
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 13px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('✨ СОТРИ МЕНЯ ПАЛЬЦЕМ ✨', canvas.width / 2, canvas.height / 2 + 4);
+            ctx.fillText('⚡ ТРИ СЮДА ПАЛЬЦЕМ ⚡', canvas.width / 2, canvas.height / 2 + 5);
+            ctx.globalCompositeOperation = 'destination-out';
+        }, 50);
 
-            let isDrawing = false;
-
-            function scratch(e) {
-                if (!isDrawing) return;
-                const bounds = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                const x = clientX - bounds.left;
-                const y = clientY - bounds.top;
-
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.beginPath();
-                ctx.arc(x, y, 20, 0, Math.PI * 2);
-                ctx.fill();
-
-                checkScratchPercent();
-            }
-
-            function checkScratchPercent() {
-                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                let clearPixels = 0;
-                for (let i = 3; i < imgData.data.length; i += 4) {
-                    if (imgData.data[i] === 0) clearPixels++;
-                }
-                const percent = (clearPixels / (imgData.data.length / 4)) * 100;
-
-                if (percent > 45) {
-                    canvas.classList.add('hidden');
-                    appData.stickers[owner][index].scratched = true;
-                    saveData();
-                    triggerConfetti();
-                }
-            }
-
-            canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
-            canvas.addEventListener('mousemove', scratch);
-            window.addEventListener('mouseup', () => isDrawing = false);
-
-            canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
-            canvas.addEventListener('touchmove', scratch);
-            window.addEventListener('touchend', () => isDrawing = false);
+        function scratch(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            ctx.beginPath();
+            ctx.arc(x, y, 22, 0, Math.PI * 2);
+            ctx.fill();
         }
 
-        function toggleStickerComplete(owner, index) {
-            appData.stickers[owner][index].completed = !appData.stickers[owner][index].completed;
-            if (appData.stickers[owner][index].completed) triggerConfetti();
-            saveData();
-            renderStickers();
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('mousemove', scratch);
+        window.addEventListener('mouseup', () => isDrawing = false);
+
+        canvas.addEventListener('touchstart', () => isDrawing = true);
+        canvas.addEventListener('touchmove', scratch);
+        window.addEventListener('touchend', () => isDrawing = false);
+    }
+
+    // ВИШЛИСТ
+    function loadWishes() {
+        const container = document.getElementById('wishes-container');
+        document.getElementById('wish-list-title').innerText = currentProfile === 'vanya' ? "Желания Вани" : "Желания Насти";
+        container.innerHTML = '';
+
+        let wishes = JSON.parse(localStorage.getItem(`wishes_${currentProfile}`)) || [];
+        wishes.forEach((w, idx) => {
+            const item = document.createElement('div');
+            item.className = `wish-item ${w.done ? 'done' : ''}`;
+            item.innerHTML = `
+                <span>${w.text}</span>
+                <input type="checkbox" ${w.done ? 'checked' : ''} onclick="toggleWish(${idx})" style="width: 18px; height: 18px; accent-color: var(--primary);">
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function addWish() {
+        const input = document.getElementById('new-wish-text');
+        if (!input.value.trim()) return;
+        let wishes = JSON.parse(localStorage.getItem(`wishes_${currentProfile}`)) || [];
+        wishes.push({ text: input.value, done: false });
+        localStorage.setItem(`wishes_${currentProfile}`, JSON.stringify(wishes));
+        input.value = '';
+        loadWishes();
+    }
+
+    function toggleWish(idx) {
+        let wishes = JSON.parse(localStorage.getItem(`wishes_${currentProfile}`)) || [];
+        wishes[idx].done = !wishes[idx].done;
+        localStorage.setItem(`wishes_${currentProfile}`, JSON.stringify(wishes));
+        loadWishes();
+    }
+
+    // ЧАТ
+    function loadChat() {
+        const box = document.getElementById('chat-messages');
+        box.innerHTML = '';
+        let messages = JSON.parse(localStorage.getItem('love_chat')) || [
+            { sender: 'vanya', text: 'Привет, любимая! Ждешь вечер? 🔥' },
+            { sender: 'nastya', text: 'Ой, очень жду, котик 😉' }
+        ];
+
+        messages.forEach(m => {
+            const msg = document.createElement('div');
+            msg.className = `chat-msg ${m.sender}`;
+            msg.innerText = m.text;
+            box.appendChild(msg);
+        });
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        if (!input.value.trim()) return;
+        let messages = JSON.parse(localStorage.getItem('love_chat')) || [];
+        messages.push({ sender: currentProfile, text: input.value });
+        localStorage.setItem('love_chat', JSON.stringify(messages));
+        input.value = '';
+        loadChat();
+    }
+
+    // РУЛЕТКА И КВЕСТЫ
+    function spinRoulette() {
+        const res = roulettePool[Math.floor(Math.random() * roulettePool.length)];
+        document.getElementById('roulette-result').innerText = res;
+    }
+
+    function loadQuests() {
+        const container = document.getElementById('quests-container');
+        container.innerHTML = '';
+        let quests = JSON.parse(localStorage.getItem('love_quests')) || defaultQuestsPool;
+        quests.forEach((q, idx) => {
+            const item = document.createElement('div');
+            item.className = `wish-item ${q.done ? 'done' : ''}`;
+            item.innerHTML = `
+                <span>${q.text}</span>
+                <input type="checkbox" ${q.done ? 'checked' : ''} onclick="toggleQuest(${idx})" style="width: 18px; height: 18px; accent-color: var(--primary);">
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function toggleQuest(idx) {
+        let quests = JSON.parse(localStorage.getItem('love_quests')) || defaultQuestsPool;
+        quests[idx].done = !quests[idx].done;
+        localStorage.setItem('love_quests', JSON.stringify(quests));
+        loadQuests();
+    }
+
+    // КНОПКА ФОТО В ЛС
+    function sendPhotoToPartner() {
+        let partner = currentProfile === 'vanya' ? tgUsernames.nastya : tgUsernames.vanya;
+        if (!partner) {
+            alert('Сначала укажи юзернеймы Telegram в настройках (шестеренка вверху)!');
+            openSettings();
+            return;
         }
+        window.open(`https://t.me/${partner}?text=🔥 Вот тебе горячее фото 18+! Срочно открой!`, '_blank');
+    }
 
-        // --- WISHES LOGIC ---
-        function addWish() {
-            const input = document.getElementById('wishInput');
-            const category = document.getElementById('wishCategory').value;
-            const text = input.value.trim();
+    function openSettings() {
+        document.getElementById('my-tg').value = tgUsernames[currentProfile];
+        let partnerKey = currentProfile === 'vanya' ? 'nastya' : 'vanya';
+        document.getElementById('partner-tg').value = tgUsernames[partnerKey];
+        document.getElementById('settings-modal').classList.add('open');
+    }
 
-            if (!text) return;
+    function saveSettings() {
+        tgUsernames[currentProfile] = document.getElementById('my-tg').value.replace('@','');
+        let partnerKey = currentProfile === 'vanya' ? 'nastya' : 'vanya';
+        tgUsernames[partnerKey] = document.getElementById('partner-tg').value.replace('@','');
+        localStorage.setItem('love_tg_users', JSON.stringify(tgUsernames));
+        document.getElementById('settings-modal').classList.remove('open');
+        alert('Настройки сохранены!');
+    }
 
-            appData.wishes.unshift({
-                id: Date.now(),
-                text: text,
-                category: category,
-                author: currentUser,
-                done: false
-            });
-
-            input.value = '';
-            saveData();
-            renderWishes('all');
-            triggerConfetti();
-        }
-
-        function renderWishes(filter) {
-            const container = document.getElementById('wishesList');
-            container.innerHTML = '';
-
-            let filtered = appData.wishes;
-            if (filter === 'vanya') filtered = appData.wishes.filter(w => w.author === 'vanya');
-            if (filter === 'nastya') filtered = appData.wishes.filter(w => w.author === 'nastya');
-
-            filtered.forEach(wish => {
-                const card = document.createElement('div');
-                card.className = `glass-card rounded-xl p-3 flex items-center justify-between border ${wish.done ? 'border-green-500/30 opacity-60' : 'border-white/10'}`;
-
-                card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <button onclick="toggleWish(${wish.id})" class="w-6 h-6 rounded-lg border border-pink-500/50 flex items-center justify-center ${wish.done ? 'bg-green-500 text-white' : 'bg-black/40'}">
-                            ${wish.done ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
-                        </button>
-                        <div>
-                            <p class="text-xs font-semibold text-white ${wish.done ? 'line-through text-gray-400' : ''}">${wish.text}</p>
-                            <span class="text-[10px] text-pink-300">От: ${wish.author === 'vanya' ? '♂ Вани' : '♀ Насти'} • ${wish.category}</span>
-                        </div>
-                    </div>
-                    <button onclick="deleteWish(${wish.id})" class="text-gray-500 hover:text-red-400 text-xs px-2">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function toggleWish(id) {
-            const wish = appData.wishes.find(w => w.id === id);
-            if (wish) {
-                wish.done = !wish.done;
-                if (wish.done) triggerConfetti();
-                saveData();
-                renderWishes('all');
-            }
-        }
-
-        function deleteWish(id) {
-            appData.wishes = appData.wishes.filter(w => w.id !== id);
-            saveData();
-            renderWishes('all');
-        }
-
-        // --- CHAT & HOT 18+ PHOTO LOGIC ---
-        function sendHotPhotoToTG() {
-            // Target recipient is the OTHER person
-            const recipientUser = currentUser === 'vanya' ? usernames.nastya : usernames.vanya;
-            const text = encodeURIComponent("🔥 Малыш, у меня для тебя кое-что очень горячее... Лови 18+ фото!");
-            const tgUrl = `https://t.me/${recipientUser}?text=${text}`;
-
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
-                window.Telegram.WebApp.openTelegramLink(tgUrl);
-            } else {
-                window.open(tgUrl, '_blank');
-            }
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            appData.chat.push({
-                author: currentUser,
-                text: text
-            });
-
-            input.value = '';
-            saveData();
-            renderChat();
-        }
-
-        function renderChat() {
-            const container = document.getElementById('chatMessages');
-            container.innerHTML = '';
-
-            appData.chat.forEach(msg => {
-                const isMe = msg.author === currentUser;
-                const msgEl = document.createElement('div');
-                msgEl.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
-
-                msgEl.innerHTML = `
-                    <div class="max-w-[80%] rounded-2xl px-3 py-2 text-xs ${isMe ? 'bg-gradient-to-r from-neonPink to-hotRose text-white' : 'bg-black/60 border border-white/10 text-gray-200'}">
-                        <span class="text-[9px] block opacity-70 mb-0.5">${msg.author === 'vanya' ? '♂ Ваня' : '♀ Настя'}</span>
-                        <p>${msg.text}</p>
-                    </div>
-                `;
-                container.appendChild(msgEl);
-            });
-
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // --- ROULETTE & QUESTS LOGIC ---
-        function spinRoulette() {
-            const btn = document.getElementById('btnSpin');
-            btn.disabled = true;
-
-            let count = 0;
-            const interval = setInterval(() => {
-                document.getElementById('reelWhere').innerText = ROULETTE_DATA.where[Math.floor(Math.random() * ROULETTE_DATA.where.length)];
-                document.getElementById('reelHow').innerText = ROULETTE_DATA.how[Math.floor(Math.random() * ROULETTE_DATA.how.length)];
-                document.getElementById('reelAction').innerText = ROULETTE_DATA.action[Math.floor(Math.random() * ROULETTE_DATA.action.length)];
-                count++;
-
-                if (count > 20) {
-                    clearInterval(interval);
-                    btn.disabled = false;
-                    triggerConfetti();
-                }
-            }, 80);
-        }
-
-        function renderQuests() {
-            const container = document.getElementById('questsContainer');
-            container.innerHTML = '';
-
-            appData.quests.forEach(quest => {
-                const card = document.createElement('div');
-                card.className = 'glass-card rounded-xl p-3 flex justify-between items-center border border-white/10';
-
-                card.innerHTML = `
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-xs text-white">${quest.title}</span>
-                            <span class="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300">${quest.level}</span>
-                        </div>
-                        <p class="text-[11px] text-gray-300">${quest.desc}</p>
-                    </div>
-                    <button onclick="toggleQuest(${quest.id})" class="px-3 py-1 rounded-xl text-xs font-bold ${quest.done ? 'bg-green-600 text-white' : 'bg-neonPink text-white'} shadow-neon">
-                        ${quest.done ? '✅' : 'Сделать'}
-                    </button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function toggleQuest(id) {
-            const quest = appData.quests.find(q => q.id === id);
-            if (quest) {
-                quest.done = !quest.done;
-                if (quest.done) triggerConfetti();
-                saveData();
-                renderQuests();
-            }
-        }
-
-        // --- FANTASIES MATCHER LOGIC ---
-        function renderFantasies() {
-            const container = document.getElementById('fantasiesContainer');
-            container.innerHTML = '';
-
-            FANTASIES_LIST.forEach((fantasy, idx) => {
-                const answers = appData.fantasies[idx] || {};
-                const vanyaAns = answers.vanya;
-                const nastyaAns = answers.nastya;
-
-                // Match condition: Both chose positive
-                const isMatch = (vanyaAns === 'want' || vanyaAns === 'ready') && (nastyaAns === 'want' || nastyaAns === 'ready');
-
-                const card = document.createElement('div');
-                card.className = `glass-card rounded-xl p-3 border ${isMatch ? 'border-neonPink shadow-neon bg-pink-950/30' : 'border-white/10'}`;
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-white">${fantasy}</span>
-                        ${isMatch ? '<span class="text-[10px] font-black text-neonPink animate-pulse">🔥 СОВПАДЕНИЕ!</span>' : ''}
-                    </div>
-
-                    <div class="flex gap-1 text-[10px]">
-                        <button onclick="setFantasyChoice(${idx}, 'want')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'want' ? 'bg-neonPink text-white' : 'bg-black/40 text-gray-400'}">
-                            😍 Очень хочу
-                        </button>
-                        <button onclick="setFantasyChoice(${idx}, 'ready')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'ready' ? 'bg-purple-600 text-white' : 'bg-black/40 text-gray-400'}">
-                            😏 Готов(а)
-                        </button>
-                        <button onclick="setFantasyChoice(${idx}, 'no')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'no' ? 'bg-gray-700 text-white' : 'bg-black/40 text-gray-400'}">
-                            🙈 Табу
-                        </button>
-                    </div>
-                `;
-
-                container.appendChild(card);
-            });
-        }
-
-        function setFantasyChoice(index, choice) {
-            if (!appData.fantasies[index]) appData.fantasies[index] = {};
-            appData.fantasies[index][currentUser] = choice;
-
-            saveData();
-            renderFantasies();
-
-            // Confetti if matched
-            const answers = appData.fantasies[index];
-            if ((answers.vanya === 'want' || answers.vanya === 'ready') && (answers.nastya === 'want' || answers.nastya === 'ready')) {
-                triggerConfetti();
-            }
-        }
-
-        // --- SETTINGS MODAL ---
-        function openSettingsModal() {
-            document.getElementById('settingsModal').classList.remove('hidden');
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').classList.add('hidden');
-        }
-
-        function saveSettings() {
-            usernames.vanya = document.getElementById('inputUsernameVanya').value.trim() || 'tikhon_official';
-            usernames.nastya = document.getElementById('inputUsernameNastya').value.trim() || 'nastya';
-            saveData();
-            closeSettingsModal();
-        }
-
-        // --- UTILS ---
-        function triggerConfetti() {
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                origin: { y: 0.7 },
-                colors: ['#ff0055', '#ff2a6d', '#9d00ff', '#ffb700']
-            });
-        }
-    </script>
+    initApp();
+</script>
 </body>
 </html>
-```
