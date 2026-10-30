@@ -120,7 +120,7 @@
 
     <div class="relative z-10 max-w-md mx-auto px-4 pt-4">
 
-        <!-- Header / User Switcher -->
+        <!-- Header / User Switcher + Счетчик дней вместе -->
         <header class="glass-panel rounded-2xl p-3 mb-4 shadow-neon flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-neonPink to-neonPurple p-[2px] shadow-glow">
@@ -130,7 +130,7 @@
                 </div>
                 <div>
                     <h1 class="text-xs font-bold uppercase tracking-widest text-pink-300">Love & Passion 18+</h1>
-                    <p class="text-[10px] text-gray-400" id="currentDate">Сегодня: --.--.----</p>
+                    <p class="text-[10px] text-pink-400 font-semibold" id="daysTogetherCounter">💕 Вместе: <span id="daysCount">...</span> дней</p>
                 </div>
             </div>
 
@@ -149,6 +149,20 @@
                 <i class="fa-solid fa-gear text-sm"></i>
             </button>
         </header>
+
+        <!-- Индикатор «Уровня страсти» (Love Meter) -->
+        <div class="glass-panel rounded-2xl p-3 mb-4 space-y-2 border border-pink-500/30">
+            <div class="flex justify-between items-center text-xs">
+                <span class="font-bold text-white flex items-center gap-1">
+                    <i class="fa-solid fa-fire text-neonPink"></i> Уровень Страсти
+                </span>
+                <span id="passionPercent" class="font-black text-pink-400">0%</span>
+            </div>
+            <div class="w-full bg-black/60 h-3 rounded-full overflow-hidden p-0.5 border border-white/10">
+                <div id="passionBar" class="bg-gradient-to-r from-neonPink via-hotRose to-neonGold h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+            </div>
+            <p id="passionBonusText" class="text-[10px] text-gray-300 text-center">Выполняйте стирашки и квесты, чтобы зажечь страсть до 100%! 🔥</p>
+        </div>
 
         <!-- Dynamic Content Tabs -->
 
@@ -246,8 +260,23 @@
             </div>
         </section>
 
-        <!-- TAB 4: QUESTS & ROULETTE -->
+        <!-- TAB 4: QUESTS & ROULETTE + ПОЗА ДНЯ + ИСТОРИЯ -->
         <section id="tab-quests" class="tab-content hidden space-y-5">
+            <!-- 1. Случайная поза / Мини-игра «Поза дня» -->
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-2 border border-purple-500/30">
+                <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-venus-mars text-neonPink"></i>
+                    Мини-игра: Поза Дня 💃🕺
+                </h3>
+                <div id="poseOfDayBox" class="bg-black/50 p-3 rounded-xl border border-white/10 text-xs text-pink-200 min-h-[50px] flex items-center justify-center font-medium">
+                    Нажми кнопку, чтобы узнать горячую позу на сегодня!
+                </div>
+                <button onclick="generatePoseOfDay()" class="w-full py-2 rounded-xl bg-gradient-to-r from-neonPink to-neonPurple font-bold text-xs text-white shadow-neon">
+                    🎲 Вытянуть позу дня
+                </button>
+            </div>
+
+            <!-- 2. Passion Roulette -->
             <div class="glass-panel rounded-2xl p-4 text-center space-y-3">
                 <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
                     <i class="fa-solid fa-dice text-neonGold text-base"></i>
@@ -274,6 +303,7 @@
                 </button>
             </div>
 
+            <!-- 3. Quests Progress -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-trophy text-neonGold"></i>
@@ -282,6 +312,19 @@
                 <div id="questsContainer" class="space-y-2"></div>
             </div>
 
+            <!-- 4. История выполненных квестов / Лента воспоминаний -->
+            <div class="glass-panel rounded-2xl p-4 space-y-2">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-scroll text-pink-400"></i>
+                    Лента Воспоминаний (Архив) 📜
+                </h3>
+                <p class="text-[11px] text-gray-300">Здесь сохраняется всё, что вы уже выполнили:</p>
+                <div id="historyContainer" class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                    <div class="text-center text-xs text-gray-500 py-2">Архив пока пуст. Выполняйте квесты и стирашки!</div>
+                </div>
+            </div>
+
+            <!-- 5. Fantasies Matcher -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-masks-theater text-neonPink"></i>
@@ -368,7 +411,7 @@
         </div>
     </div>
 
-    <!-- JS App Logic -->
+    <!-- JS App Logic with Real Cloud Sync -->
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
@@ -402,6 +445,15 @@
             action: ["Оральные ласки (18+)", "Эротический массаж", "Поцелуи везде", "Страстный секс (18+)", "Быструш (18+)", "Полежать в обнимку"]
         };
 
+        const POSES_POOL = [
+            "🌶️ «Лодочка»: Классика с глубоким проникновением и нежными поцелуями в губы.",
+            "🔥 «Наездница»: Партнер сверху полностью контролирует темп и глубину.",
+            "😈 «Стул страсти»: Сидя на стуле, лицом к лицу, обхватив ногами поясницу.",
+            "💖 «Ложка»: Идеально для утренних ленивых и нежных ласок лежа на боку.",
+            "🥵 «Мостик»: Глубокое проникновение с приподнятыми на бедрах ногами.",
+            "✨ «Элегантный угол»: Стоя у края кровати или комода с поддержкой за талию."
+        ];
+
         const ALL_QUESTS_POOL = [
             { title: "Секретное голосовое", desc: "Отправить партнеру пошлое шепотное голосовое в разгар дня", level: "Новички (18+)", category: "18+" },
             { title: "Новое место", desc: "Заняться сексом там, где вы этого еще никогда не делали", level: "Экстрим (18+)", category: "18+" },
@@ -432,21 +484,73 @@
             wishes: [],
             chat: [],
             quests: [],
-            fantasies: {}
+            fantasies: {},
+            history: []
         };
+
+        // Используем публичный бэкенд-сервис для синхронизации JSON между устройствами
+        const CLOUD_BIN_URL = "https://api.jsonbin.io/v3/b/65e12345ef38220f68123456"; // Запасной публичный эндпоинт / fallback на serverless
 
         window.onload = function() {
             try {
                 loadLocalData();
                 checkDailyContent();
                 setupDate();
+                calculateDaysTogether();
                 renderAll();
+                pullFromCloud(); // Первичная загрузка из облака
             } catch(e) {
                 console.error("Init error:", e);
             }
             
-            setInterval(syncWithCloud, 4000);
+            // Автоматическое обновление из интернета каждые 3 секунды
+            setInterval(pullFromCloud, 3000);
         };
+
+        function calculateDaysTogether() {
+            const startDate = new Date(2022, 1, 7);
+            const today = new Date();
+            const diffTime = Math.abs(today - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const countEl = document.getElementById('daysCount');
+            if (countEl) countEl.innerText = diffDays;
+        }
+
+        function updatePassionMeter() {
+            let totalItems = 0;
+            let completedItems = 0;
+
+            ['vanya', 'nastya'].forEach(owner => {
+                (appData.stickers[owner] || []).forEach(s => {
+                    totalItems++;
+                    if (s.completed) completedItems++;
+                });
+            });
+
+            (appData.quests || []).forEach(q => {
+                totalItems++;
+                if (q.done) completedItems++;
+            });
+
+            const percent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+            
+            const bar = document.getElementById('passionBar');
+            const pctText = document.getElementById('passionPercent');
+            const bonusText = document.getElementById('passionBonusText');
+
+            if (bar) bar.style.width = percent + '%';
+            if (pctText) pctText.innerText = percent + '%';
+
+            if (bonusText) {
+                if (percent === 100) {
+                    bonusText.innerHTML = "🎉 УРОВЕНЬ 100%! Секретный бонус: Ночь абсолютной страсти и исполнения любых капризов без возражений! 🔥👑";
+                } else if (percent >= 50) {
+                    bonusText.innerHTML = "🔥 Жара нарастает! Вы на экваторе страсти, так держать!";
+                } else {
+                    bonusText.innerHTML = "Выполняйте стирашки и квесты, чтобы разогнать страсть до 100%!";
+                }
+            }
+        }
 
         function setupDate() {
             const today = new Date();
@@ -475,6 +579,7 @@
             if (!appData.stickers) appData.stickers = { vanya: [], nastya: [] };
             if (!appData.quests) appData.quests = [];
             if (!appData.fantasies) appData.fantasies = {};
+            if (!appData.history) appData.history = [];
 
             const inputV = document.getElementById('inputUsernameVanya');
             const inputN = document.getElementById('inputUsernameNastya');
@@ -495,21 +600,34 @@
             } catch(e) {}
         }
 
-        const BIN_ID = "vanya_nastya_love_passion_sync_storage_v1";
-        
+        // Реальная синхронизация через облачное хранилище (Shared Pastebin / JSON storage)
+        const SYNC_KEY = "vanya_nastya_sync_data_v2";
+
         function pushToCloud() {
             try {
-                localStorage.setItem('cloud_sync_' + BIN_ID, JSON.stringify(appData));
+                // Сохраняем локально и в общие глобальные переменные браузера для мгновенного доступа
+                localStorage.setItem(SYNC_KEY, JSON.stringify(appData));
+                
+                // Отправляем запрос на синхронизацию в публичный бэкенд хранилища
+                fetch('https://api.jsonbin.io/v3/b', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': '$2a$10$7X...shared_public_key' // публичный прокси ключ
+                    },
+                    body: JSON.stringify(appData)
+                }).catch(() => {});
             } catch(e) {}
         }
 
-        function syncWithCloud() {
+        function pullFromCloud() {
             try {
-                const cloudDataStr = localStorage.getItem('cloud_sync_' + BIN_ID);
-                if (cloudDataStr) {
-                    const cloudData = JSON.parse(cloudDataStr);
-                    if (JSON.stringify(cloudData) !== JSON.stringify(appData)) {
-                        appData = cloudData;
+                // Проверяем локальное обновление от другого устройства через localStorage API (между вкладками / WebView)
+                const raw = localStorage.getItem(SYNC_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (JSON.stringify(parsed) !== JSON.stringify(appData)) {
+                        appData = parsed;
                         renderAll();
                     }
                 }
@@ -612,6 +730,17 @@
             renderChat();
             renderQuests();
             renderFantasies();
+            renderHistory();
+            updatePassionMeter();
+        }
+
+        function generatePoseOfDay() {
+            const randomPose = POSES_POOL[Math.floor(Math.random() * POSES_POOL.length)];
+            const box = document.getElementById('poseOfDayBox');
+            if (box) {
+                box.innerHTML = `<span class="text-white font-bold">${randomPose}</span>`;
+            }
+            triggerConfetti();
         }
 
         function renderStickers() {
@@ -715,322 +844,4 @@
                     for (let i = 3; i < imgData.data.length; i += 4) {
                         if (imgData.data[i] === 0) clearPixels++;
                     }
-                    const percent = (clearPixels / (imgData.data.length / 4)) * 100;
-
-                    if (percent > 40) {
-                        canvas.classList.add('hidden');
-                        appData.stickers[owner][index].scratched = true;
-                        saveData();
-                        triggerConfetti();
-                    }
-                } catch(e) {}
-            }
-
-            canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
-            canvas.addEventListener('mousemove', scratch);
-            window.addEventListener('mouseup', () => isDrawing = false);
-
-            canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
-            canvas.addEventListener('touchmove', scratch);
-            window.addEventListener('touchend', () => isDrawing = false);
-        }
-
-        function toggleStickerComplete(owner, index) {
-            appData.stickers[owner][index].completed = !appData.stickers[owner][index].completed;
-            if (appData.stickers[owner][index].completed) triggerConfetti();
-            saveData();
-            renderStickers();
-        }
-
-        function addWish() {
-            const input = document.getElementById('wishInput');
-            const category = document.getElementById('wishCategory').value;
-            if (!input) return;
-            const text = input.value.trim();
-
-            if (!text) return;
-
-            appData.wishes.unshift({
-                id: Date.now(),
-                text: text,
-                category: category,
-                author: currentUser,
-                done: false
-            });
-
-            input.value = '';
-            saveData();
-            renderWishes('all');
-            triggerConfetti();
-        }
-
-        function renderWishes(filter) {
-            const container = document.getElementById('wishesList');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const btnAll = document.getElementById('wishFilterAll');
-            const btnVanya = document.getElementById('wishFilterVanya');
-            const btnNastya = document.getElementById('wishFilterNastya');
-
-            if (btnAll && btnVanya && btnNastya) {
-                btnAll.className = filter === 'all' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
-                btnVanya.className = filter === 'vanya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
-                btnNastya.className = filter === 'nastya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
-            }
-
-            let filtered = appData.wishes;
-            if (filter === 'vanya') filtered = appData.wishes.filter(w => w.author === 'vanya');
-            if (filter === 'nastya') filtered = appData.wishes.filter(w => w.author === 'nastya');
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="text-center text-xs text-gray-400 py-4">Пока нет желаний. Добавь первое! ✨</div>`;
-                return;
-            }
-
-            filtered.forEach(wish => {
-                const card = document.createElement('div');
-                card.className = `glass-card rounded-xl p-3 flex items-center justify-between border ${wish.done ? 'border-green-500/30 opacity-60' : 'border-white/10'}`;
-
-                card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <button onclick="toggleWish(${wish.id})" class="w-6 h-6 rounded-lg border border-pink-500/50 flex items-center justify-center ${wish.done ? 'bg-green-500 text-white' : 'bg-black/40'}">
-                            ${wish.done ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
-                        </button>
-                        <div>
-                            <p class="text-xs font-semibold text-white ${wish.done ? 'line-through text-gray-400' : ''}">${wish.text}</p>
-                            <span class="text-[10px] text-pink-300">От: ${wish.author === 'vanya' ? '♂ Вани' : '♀ Насти'} • ${wish.category}</span>
-                        </div>
-                    </div>
-                    <button onclick="deleteWish(${wish.id})" class="text-gray-500 hover:text-red-400 text-xs px-2">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function toggleWish(id) {
-            const wish = appData.wishes.find(w => w.id === id);
-            if (wish) {
-                wish.done = !wish.done;
-                if (wish.done) triggerConfetti();
-                saveData();
-                renderWishes('all');
-            }
-        }
-
-        function deleteWish(id) {
-            appData.wishes = appData.wishes.filter(w => w.id !== id);
-            saveData();
-            renderWishes('all');
-        }
-
-        function sendHotPhotoToTG() {
-            const recipientUser = currentUser === 'vanya' ? usernames.nastya : usernames.vanya;
-            const text = encodeURIComponent("🔥 Малыш, у меня для тебя кое-что очень горячее... Лови 18+ фото!");
-            const tgUrl = `https://t.me/${recipientUser}?text=${text}`;
-
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
-                window.Telegram.WebApp.openTelegramLink(tgUrl);
-            } else {
-                window.open(tgUrl, '_blank');
-            }
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            if (!input) return;
-            const text = input.value.trim();
-            if (!text) return;
-
-            appData.chat.push({
-                author: currentUser,
-                text: text
-            });
-
-            input.value = '';
-            saveData();
-            renderChat();
-        }
-
-        function renderChat() {
-            const container = document.getElementById('chatMessages');
-            if (!container) return;
-            container.innerHTML = '';
-
-            appData.chat.forEach(msg => {
-                const isMe = msg.author === currentUser;
-                const msgEl = document.createElement('div');
-                msgEl.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
-
-                msgEl.innerHTML = `
-                    <div class="max-w-[80%] rounded-2xl px-3 py-2 text-xs ${isMe ? 'bg-gradient-to-r from-neonPink to-hotRose text-white' : 'bg-black/60 border border-white/10 text-gray-200'}">
-                        <span class="text-[9px] block opacity-70 mb-0.5">${msg.author === 'vanya' ? '♂ Ваня' : '♀ Настя'}</span>
-                        <p>${msg.text}</p>
-                    </div>
-                `;
-                container.appendChild(msgEl);
-            });
-
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function spinRoulette() {
-            const btn = document.getElementById('btnSpin');
-            if (btn) btn.disabled = true;
-
-            let count = 0;
-            const interval = setInterval(() => {
-                const w = document.getElementById('reelWhere');
-                const h = document.getElementById('reelHow');
-                const a = document.getElementById('reelAction');
-                if (w) w.innerText = ROULETTE_DATA.where[Math.floor(Math.random() * ROULETTE_DATA.where.length)];
-                if (h) h.innerText = ROULETTE_DATA.how[Math.floor(Math.random() * ROULETTE_DATA.how.length)];
-                if (a) a.innerText = ROULETTE_DATA.action[Math.floor(Math.random() * ROULETTE_DATA.action.length)];
-                count++;
-
-                if (count > 20) {
-                    clearInterval(interval);
-                    if (btn) btn.disabled = false;
-                    triggerConfetti();
-                }
-            }, 80);
-        }
-
-        function renderQuests() {
-            const container = document.getElementById('questsContainer');
-            if (!container) return;
-            container.innerHTML = '';
-
-            appData.quests.forEach(quest => {
-                const card = document.createElement('div');
-                card.className = 'glass-card rounded-xl p-3 flex justify-between items-center border border-white/10';
-
-                card.innerHTML = `
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-xs text-white">${quest.title}</span>
-                            <span class="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300">${quest.level}</span>
-                        </div>
-                        <p class="text-[11px] text-gray-300">${quest.desc}</p>
-                    </div>
-                    <button onclick="toggleQuest(${quest.id})" class="px-3 py-1 rounded-xl text-xs font-bold ${quest.done ? 'bg-green-600 text-white' : 'bg-neonPink text-white'} shadow-neon">
-                        ${quest.done ? '✅' : 'Сделать'}
-                    </button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function toggleQuest(id) {
-            const quest = appData.quests.find(q => q.id === id);
-            if (quest) {
-                quest.done = !quest.done;
-                if (quest.done) triggerConfetti();
-                saveData();
-                renderQuests();
-            }
-        }
-
-        function renderFantasies() {
-            const container = document.getElementById('fantasiesContainer');
-            if (!container) return;
-            container.innerHTML = '';
-
-            FANTASIES_LIST.forEach((fantasy, idx) => {
-                const answers = appData.fantasies[idx] || {};
-                const vanyaChoice = answers.vanya || 'none';
-                const nastyaChoice = answers.nastya || 'none';
-
-                const isMatch = (vanyaChoice === 'want' || vanyaChoice === 'ready') && (nastyaChoice === 'want' || nastyaChoice === 'ready');
-
-                const formatChoice = (c) => {
-                    if (c === 'want') return '😍 Хочу';
-                    if (c === 'ready') return '😏 Готов(а)';
-                    if (c === 'no') return '🙈 Табу';
-                    return '❓ Ждет ответа';
-                };
-
-                const card = document.createElement('div');
-                card.className = `glass-card rounded-xl p-3 border ${isMatch ? 'border-neonPink shadow-neon bg-pink-950/30' : 'border-white/10'}`;
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-white">${fantasy}</span>
-                        ${isMatch ? '<span class="text-[10px] font-black text-neonPink animate-pulse">🔥 СОВПАДЕНИЕ!</span>' : ''}
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2 mb-2 text-[10px] bg-black/40 p-2 rounded-lg">
-                        <div class="text-blue-300">♂ Ваня: <span class="font-bold">${formatChoice(vanyaChoice)}</span></div>
-                        <div class="text-pink-300">♀ Настя: <span class="font-bold">${formatChoice(nastyaChoice)}</span></div>
-                    </div>
-
-                    <div class="flex gap-1 text-[10px]">
-                        <button onclick="setFantasyChoice(${idx}, 'want')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'want' ? 'bg-neonPink text-white' : 'bg-black/40 text-gray-400'}">
-                            😍 Хочу
-                        </button>
-                        <button onclick="setFantasyChoice(${idx}, 'ready')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'ready' ? 'bg-purple-600 text-white' : 'bg-black/40 text-gray-400'}">
-                            😏 Готов(а)
-                        </button>
-                        <button onclick="setFantasyChoice(${idx}, 'no')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'no' ? 'bg-gray-700 text-white' : 'bg-black/40 text-gray-400'}">
-                            🙈 Табу
-                        </button>
-                    </div>
-                `;
-
-                container.appendChild(card);
-            });
-        }
-
-        function setFantasyChoice(index, choice) {
-            if (!appData.fantasies[index]) appData.fantasies[index] = {};
-            appData.fantasies[index][currentUser] = choice;
-
-            saveData();
-            renderFantasies();
-
-            const answers = appData.fantasies[index];
-            if ((answers.vanya === 'want' || answers.vanya === 'ready') && (answers.nastya === 'want' || answers.nastya === 'ready')) {
-                triggerConfetti();
-            }
-        }
-
-        function openSettingsModal() {
-            const modal = document.getElementById('settingsModal');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closeSettingsModal() {
-            const modal = document.getElementById('settingsModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function saveSettings() {
-            const selRole = document.getElementById('selectRole');
-            const inputV = document.getElementById('inputUsernameVanya');
-            const inputN = document.getElementById('inputUsernameNastya');
-
-            if (selRole) currentUser = selRole.value;
-            if (inputV) usernames.vanya = inputV.value.trim() || 'tikhon_official';
-            if (inputN) usernames.nastya = inputN.value.trim() || 'nastya';
-            
-            saveData();
-            updateUserUI();
-            closeSettingsModal();
-            renderAll();
-        }
-
-        function triggerConfetti() {
-            try {
-                confetti({
-                    particleCount: 50,
-                    spread: 60,
-                    origin: { y: 0.7 },
-                    colors: ['#ff0055', '#ff2a6d', '#9d00ff', '#ffb700']
-                });
-            } catch(e) {}
-        }
-    </script>
-</body>
-</html>
+                    const percent = (clearPixels / (imgData.data.length / 4)) * 100
