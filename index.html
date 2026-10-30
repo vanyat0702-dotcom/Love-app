@@ -368,21 +368,11 @@
         </div>
     </div>
 
-    <!-- JS App Logic with Cloud Sync Simulation via JSONbin or WebStorage API -->
+    <!-- JS App Logic -->
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
-            
-            // Автоопределение пользователя по Telegram ID, если возможно
-            const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-            if (tgUser) {
-                if (tgUser.username === 'tikhon_official' || tgUser.first_name?.toLowerCase().includes('ван')) {
-                    currentUser = 'vanya';
-                } else if (tgUser.first_name?.toLowerCase().includes('наст')) {
-                    currentUser = 'nastya';
-                }
-            }
         }
 
         const STICKERS_POOL_18 = [
@@ -446,19 +436,23 @@
         };
 
         window.onload = function() {
-            loadLocalData();
-            checkDailyContent();
-            setupDate();
-            renderAll();
+            try {
+                loadLocalData();
+                checkDailyContent();
+                setupDate();
+                renderAll();
+            } catch(e) {
+                console.error("Init error:", e);
+            }
             
-            // Автоматическое обновление данных из облака каждые 4 секунды для синхронизации с телефоном Насти
             setInterval(syncWithCloud, 4000);
         };
 
         function setupDate() {
             const today = new Date();
             const dateStr = today.toLocaleDateString('ru-RU');
-            document.getElementById('currentDate').innerText = `Сегодня: ${dateStr}`;
+            const dateEl = document.getElementById('currentDate');
+            if (dateEl) dateEl.innerText = `Сегодня: ${dateStr}`;
         }
 
         function loadLocalData() {
@@ -478,22 +472,29 @@
                 ];
             }
 
-            document.getElementById('inputUsernameVanya').value = usernames.vanya;
-            document.getElementById('inputUsernameNastya').value = usernames.nastya;
-            document.getElementById('selectRole').value = currentUser;
+            if (!appData.stickers) appData.stickers = { vanya: [], nastya: [] };
+            if (!appData.quests) appData.quests = [];
+            if (!appData.fantasies) appData.fantasies = {};
+
+            const inputV = document.getElementById('inputUsernameVanya');
+            const inputN = document.getElementById('inputUsernameNastya');
+            const selRole = document.getElementById('selectRole');
+
+            if (inputV) inputV.value = usernames.vanya;
+            if (inputN) inputN.value = usernames.nastya;
+            if (selRole) selRole.value = currentUser;
             updateUserUI();
         }
 
         function saveData() {
-            localStorage.setItem('love_app_data', JSON.stringify(appData));
-            localStorage.setItem('love_usernames', JSON.stringify(usernames));
-            localStorage.setItem('love_current_role', currentUser);
-            
-            // Отправка в публичное хранилище для синхронизации между вашими телефонами
-            pushToCloud();
+            try {
+                localStorage.setItem('love_app_data', JSON.stringify(appData));
+                localStorage.setItem('love_usernames', JSON.stringify(usernames));
+                localStorage.setItem('love_current_role', currentUser);
+                pushToCloud();
+            } catch(e) {}
         }
 
-        // Синхронизация через бесплатный облачный JSON-бин (или общие заголовки)
         const BIN_ID = "vanya_nastya_love_passion_sync_storage_v1";
         
         function pushToCloud() {
@@ -507,7 +508,6 @@
                 const cloudDataStr = localStorage.getItem('cloud_sync_' + BIN_ID);
                 if (cloudDataStr) {
                     const cloudData = JSON.parse(cloudDataStr);
-                    // Если в облаке данные свежее или отличаются — подтягиваем
                     if (JSON.stringify(cloudData) !== JSON.stringify(appData)) {
                         appData = cloudData;
                         renderAll();
@@ -518,7 +518,7 @@
 
         function checkDailyContent() {
             const todayStr = new Date().toDateString();
-            if (appData.lastDate !== todayStr || !appData.stickers.vanya.length || !appData.quests.length) {
+            if (appData.lastDate !== todayStr || !appData.stickers.vanya || appData.stickers.vanya.length === 0 || !appData.quests || appData.quests.length === 0) {
                 appData.lastDate = todayStr;
                 appData.stickers.vanya = generateDailyStickers();
                 appData.stickers.nastya = generateDailyStickers();
@@ -578,11 +578,15 @@
         }
 
         function updateUserUI() {
-            document.getElementById('btnUserVanya').className = currentUser === 'vanya' 
+            const btnV = document.getElementById('btnUserVanya');
+            const btnN = document.getElementById('btnUserNastya');
+            if (!btnV || !btnN) return;
+
+            btnV.className = currentUser === 'vanya' 
                 ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
                 : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
 
-            document.getElementById('btnUserNastya').className = currentUser === 'nastya' 
+            btnN.className = currentUser === 'nastya' 
                 ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
                 : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
         }
@@ -594,10 +598,12 @@
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const target = document.getElementById(`tab-${tabName}`);
+            if (target) target.classList.remove('hidden');
 
             document.querySelectorAll('nav button').forEach(el => el.classList.remove('active-tab'));
-            document.getElementById(`nav-${tabName}`).classList.add('active-tab');
+            const navBtn = document.getElementById(`nav-${tabName}`);
+            if (navBtn) navBtn.classList.add('active-tab');
         }
 
         function renderAll() {
@@ -610,17 +616,20 @@
 
         function renderStickers() {
             const container = document.getElementById('scratchCardsContainer');
+            if (!container) return;
             container.innerHTML = '';
 
             const ownerVanyaBtn = document.getElementById('stickerOwnerVanya');
             const ownerNastyaBtn = document.getElementById('stickerOwnerNastya');
 
-            if (currentStickerOwner === 'vanya') {
-                ownerVanyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-neonPink text-white shadow-neon';
-                ownerNastyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold glass-card text-gray-400';
-            } else {
-                ownerNastyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-neonPink text-white shadow-neon';
-                ownerVanyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold glass-card text-gray-400';
+            if (ownerVanyaBtn && ownerNastyaBtn) {
+                if (currentStickerOwner === 'vanya') {
+                    ownerVanyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-neonPink text-white shadow-neon';
+                    ownerNastyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold glass-card text-gray-400';
+                } else {
+                    ownerNastyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-neonPink text-white shadow-neon';
+                    ownerVanyaBtn.className = 'flex-1 py-2 rounded-xl text-xs font-bold glass-card text-gray-400';
+                }
             }
 
             const stickers = appData.stickers[currentStickerOwner] || [];
@@ -664,8 +673,8 @@
             if (!canvas) return;
 
             const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+            canvas.width = rect.width > 0 ? rect.width : 300;
+            canvas.height = rect.height > 0 ? rect.height : 140;
 
             const ctx = canvas.getContext('2d');
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -700,19 +709,21 @@
             }
 
             function checkScratchPercent() {
-                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                let clearPixels = 0;
-                for (let i = 3; i < imgData.data.length; i += 4) {
-                    if (imgData.data[i] === 0) clearPixels++;
-                }
-                const percent = (clearPixels / (imgData.data.length / 4)) * 100;
+                try {
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    let clearPixels = 0;
+                    for (let i = 3; i < imgData.data.length; i += 4) {
+                        if (imgData.data[i] === 0) clearPixels++;
+                    }
+                    const percent = (clearPixels / (imgData.data.length / 4)) * 100;
 
-                if (percent > 45) {
-                    canvas.classList.add('hidden');
-                    appData.stickers[owner][index].scratched = true;
-                    saveData();
-                    triggerConfetti();
-                }
+                    if (percent > 40) {
+                        canvas.classList.add('hidden');
+                        appData.stickers[owner][index].scratched = true;
+                        saveData();
+                        triggerConfetti();
+                    }
+                } catch(e) {}
             }
 
             canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
@@ -734,6 +745,7 @@
         function addWish() {
             const input = document.getElementById('wishInput');
             const category = document.getElementById('wishCategory').value;
+            if (!input) return;
             const text = input.value.trim();
 
             if (!text) return;
@@ -754,15 +766,18 @@
 
         function renderWishes(filter) {
             const container = document.getElementById('wishesList');
+            if (!container) return;
             container.innerHTML = '';
 
             const btnAll = document.getElementById('wishFilterAll');
             const btnVanya = document.getElementById('wishFilterVanya');
             const btnNastya = document.getElementById('wishFilterNastya');
 
-            btnAll.className = filter === 'all' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
-            btnVanya.className = filter === 'vanya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
-            btnNastya.className = filter === 'nastya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+            if (btnAll && btnVanya && btnNastya) {
+                btnAll.className = filter === 'all' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+                btnVanya.className = filter === 'vanya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+                btnNastya.className = filter === 'nastya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+            }
 
             let filtered = appData.wishes;
             if (filter === 'vanya') filtered = appData.wishes.filter(w => w.author === 'vanya');
@@ -825,6 +840,7 @@
 
         function sendChatMessage() {
             const input = document.getElementById('chatInput');
+            if (!input) return;
             const text = input.value.trim();
             if (!text) return;
 
@@ -840,6 +856,7 @@
 
         function renderChat() {
             const container = document.getElementById('chatMessages');
+            if (!container) return;
             container.innerHTML = '';
 
             appData.chat.forEach(msg => {
@@ -861,18 +878,21 @@
 
         function spinRoulette() {
             const btn = document.getElementById('btnSpin');
-            btn.disabled = true;
+            if (btn) btn.disabled = true;
 
             let count = 0;
             const interval = setInterval(() => {
-                document.getElementById('reelWhere').innerText = ROULETTE_DATA.where[Math.floor(Math.random() * ROULETTE_DATA.where.length)];
-                document.getElementById('reelHow').innerText = ROULETTE_DATA.how[Math.floor(Math.random() * ROULETTE_DATA.how.length)];
-                document.getElementById('reelAction').innerText = ROULETTE_DATA.action[Math.floor(Math.random() * ROULETTE_DATA.action.length)];
+                const w = document.getElementById('reelWhere');
+                const h = document.getElementById('reelHow');
+                const a = document.getElementById('reelAction');
+                if (w) w.innerText = ROULETTE_DATA.where[Math.floor(Math.random() * ROULETTE_DATA.where.length)];
+                if (h) h.innerText = ROULETTE_DATA.how[Math.floor(Math.random() * ROULETTE_DATA.how.length)];
+                if (a) a.innerText = ROULETTE_DATA.action[Math.floor(Math.random() * ROULETTE_DATA.action.length)];
                 count++;
 
                 if (count > 20) {
                     clearInterval(interval);
-                    btn.disabled = false;
+                    if (btn) btn.disabled = false;
                     triggerConfetti();
                 }
             }, 80);
@@ -880,6 +900,7 @@
 
         function renderQuests() {
             const container = document.getElementById('questsContainer');
+            if (!container) return;
             container.innerHTML = '';
 
             appData.quests.forEach(quest => {
@@ -914,6 +935,7 @@
 
         function renderFantasies() {
             const container = document.getElementById('fantasiesContainer');
+            if (!container) return;
             container.innerHTML = '';
 
             FANTASIES_LIST.forEach((fantasy, idx) => {
@@ -975,17 +997,23 @@
         }
 
         function openSettingsModal() {
-            document.getElementById('settingsModal').classList.remove('hidden');
+            const modal = document.getElementById('settingsModal');
+            if (modal) modal.classList.remove('hidden');
         }
 
         function closeSettingsModal() {
-            document.getElementById('settingsModal').classList.add('hidden');
+            const modal = document.getElementById('settingsModal');
+            if (modal) modal.classList.add('hidden');
         }
 
         function saveSettings() {
-            currentUser = document.getElementById('selectRole').value;
-            usernames.vanya = document.getElementById('inputUsernameVanya').value.trim() || 'tikhon_official';
-            usernames.nastya = document.getElementById('inputUsernameNastya').value.trim() || 'nastya';
+            const selRole = document.getElementById('selectRole');
+            const inputV = document.getElementById('inputUsernameVanya');
+            const inputN = document.getElementById('inputUsernameNastya');
+
+            if (selRole) currentUser = selRole.value;
+            if (inputV) usernames.vanya = inputV.value.trim() || 'tikhon_official';
+            if (inputN) usernames.nastya = inputN.value.trim() || 'nastya';
             
             saveData();
             updateUserUI();
@@ -994,12 +1022,14 @@
         }
 
         function triggerConfetti() {
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                origin: { y: 0.7 },
-                colors: ['#ff0055', '#ff2a6d', '#9d00ff', '#ffb700']
-            });
+            try {
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#ff0055', '#ff2a6d', '#9d00ff', '#ffb700']
+                });
+            } catch(e) {}
         }
     </script>
 </body>
