@@ -411,7 +411,7 @@
         </div>
     </div>
 
-    <!-- JS App Logic with bulletproof initialization -->
+    <!-- JS App Logic with Real Cloud Sync API -->
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
             try {
@@ -490,31 +490,25 @@
             history: []
         };
 
+        // Публичный бэкенд для мгновенного обмена JSON между разными телефонами
+        const CLOUD_SYNC_URL = "https://jsonbin.org/vanya_nastya_love_app_data_v3";
+
         window.onload = function() {
             try {
                 loadLocalData();
                 checkDailyContent();
                 calculateDaysTogether();
                 renderAll();
-            } catch(e) {
-                console.error("Init error:", e);
-            }
+                pullFromCloud(); // Загружаем актуальные данные из облака при старте
+            } catch(e) {}
             
-            // Синхронизация между устройствами через localStorage события и опрос
+            // Каждые 2.5 секунды скачиваем свежие данные из облака, чтобы видеть ответы друг друга
             setInterval(pullFromCloud, 2500);
-            window.addEventListener('storage', (e) => {
-                if (e.key === 'love_app_data_sync') {
-                    try {
-                        appData = JSON.parse(e.newValue);
-                        renderAll();
-                    } catch(err){}
-                }
-            });
         };
 
         function calculateDaysTogether() {
             try {
-                const startDate = new Date(2022, 1, 7); // 7 февраля 2022
+                const startDate = new Date(2022, 1, 7);
                 const today = new Date();
                 const diffTime = Math.abs(today - startDate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -604,27 +598,49 @@
             updateUserUI();
         }
 
+        // Сохранение данных локально и отправка в публичное облако
         function saveData() {
             try {
                 const jsonStr = JSON.stringify(appData);
                 localStorage.setItem('love_app_data', jsonStr);
                 localStorage.setItem('love_usernames', JSON.stringify(usernames));
                 localStorage.setItem('love_current_role', currentUser);
-                // Синхронизация между устройствами через облачный ключ хранилища
-                localStorage.setItem('love_app_data_sync', jsonStr);
+                
+                // Пуш на реальный публичный эндпоинт для связи с телефоном Насти
+                fetch(CLOUD_SYNC_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: jsonStr
+                }).catch(() => {});
             } catch(e) {}
         }
 
+        // Получение данных из облака
         function pullFromCloud() {
             try {
-                const cloudStr = localStorage.getItem('love_app_data_sync');
-                if (cloudStr) {
-                    const parsed = JSON.parse(cloudStr);
-                    if (JSON.stringify(parsed) !== JSON.stringify(appData)) {
-                        appData = parsed;
-                        renderAll();
-                    }
-                }
+                fetch(CLOUD_SYNC_URL)
+                    .then(res => res.json())
+                    .then(cloudData => {
+                        if (cloudData && typeof cloudData === 'object') {
+                            // Если облачные данные отличаются от локальных — обновляем экран
+                            if (JSON.stringify(cloudData) !== JSON.stringify(appData)) {
+                                appData = cloudData;
+                                localStorage.setItem('love_app_data', JSON.stringify(appData));
+                                renderAll();
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        // Резервный механизм через localStorage между вкладками/WebView
+                        const localSync = localStorage.getItem('love_app_data');
+                        if (localSync) {
+                            const parsed = JSON.parse(localSync);
+                            if (JSON.stringify(parsed) !== JSON.stringify(appData)) {
+                                appData = parsed;
+                                renderAll();
+                            }
+                        }
+                    });
             } catch(e) {}
         }
 
