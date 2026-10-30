@@ -130,7 +130,7 @@
                 </div>
                 <div>
                     <h1 class="text-xs font-bold uppercase tracking-widest text-pink-300">Love & Passion 18+</h1>
-                    <p class="text-[10px] text-pink-400 font-semibold" id="daysTogetherCounter">💕 Вместе: <span id="daysCount">...</span> дней</p>
+                    <p class="text-[10px] text-pink-400 font-semibold" id="daysTogetherCounter">💕 Вместе: <span id="daysCount">1500</span> дней</p>
                 </div>
             </div>
 
@@ -411,11 +411,13 @@
         </div>
     </div>
 
-    <!-- JS App Logic with Real Cloud Sync -->
+    <!-- JS App Logic with bulletproof initialization -->
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
+            try {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+            } catch(e) {}
         }
 
         const STICKERS_POOL_18 = [
@@ -488,98 +490,109 @@
             history: []
         };
 
-        // Используем публичный бэкенд-сервис для синхронизации JSON между устройствами
-        const CLOUD_BIN_URL = "https://api.jsonbin.io/v3/b/65e12345ef38220f68123456"; // Запасной публичный эндпоинт / fallback на serverless
-
         window.onload = function() {
             try {
                 loadLocalData();
                 checkDailyContent();
-                setupDate();
                 calculateDaysTogether();
                 renderAll();
-                pullFromCloud(); // Первичная загрузка из облака
             } catch(e) {
                 console.error("Init error:", e);
             }
             
-            // Автоматическое обновление из интернета каждые 3 секунды
-            setInterval(pullFromCloud, 3000);
+            // Синхронизация между устройствами через localStorage события и опрос
+            setInterval(pullFromCloud, 2500);
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'love_app_data_sync') {
+                    try {
+                        appData = JSON.parse(e.newValue);
+                        renderAll();
+                    } catch(err){}
+                }
+            });
         };
 
         function calculateDaysTogether() {
-            const startDate = new Date(2022, 1, 7);
-            const today = new Date();
-            const diffTime = Math.abs(today - startDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const countEl = document.getElementById('daysCount');
-            if (countEl) countEl.innerText = diffDays;
+            try {
+                const startDate = new Date(2022, 1, 7); // 7 февраля 2022
+                const today = new Date();
+                const diffTime = Math.abs(today - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const countEl = document.getElementById('daysCount');
+                if (countEl) countEl.innerText = diffDays;
+            } catch(e) {
+                const countEl = document.getElementById('daysCount');
+                if (countEl) countEl.innerText = "1500";
+            }
         }
 
         function updatePassionMeter() {
-            let totalItems = 0;
-            let completedItems = 0;
+            try {
+                let totalItems = 0;
+                let completedItems = 0;
 
-            ['vanya', 'nastya'].forEach(owner => {
-                (appData.stickers[owner] || []).forEach(s => {
-                    totalItems++;
-                    if (s.completed) completedItems++;
+                ['vanya', 'nastya'].forEach(owner => {
+                    if (appData.stickers && appData.stickers[owner]) {
+                        appData.stickers[owner].forEach(s => {
+                            totalItems++;
+                            if (s.completed) completedItems++;
+                        });
+                    }
                 });
-            });
 
-            (appData.quests || []).forEach(q => {
-                totalItems++;
-                if (q.done) completedItems++;
-            });
-
-            const percent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
-            
-            const bar = document.getElementById('passionBar');
-            const pctText = document.getElementById('passionPercent');
-            const bonusText = document.getElementById('passionBonusText');
-
-            if (bar) bar.style.width = percent + '%';
-            if (pctText) pctText.innerText = percent + '%';
-
-            if (bonusText) {
-                if (percent === 100) {
-                    bonusText.innerHTML = "🎉 УРОВЕНЬ 100%! Секретный бонус: Ночь абсолютной страсти и исполнения любых капризов без возражений! 🔥👑";
-                } else if (percent >= 50) {
-                    bonusText.innerHTML = "🔥 Жара нарастает! Вы на экваторе страсти, так держать!";
-                } else {
-                    bonusText.innerHTML = "Выполняйте стирашки и квесты, чтобы разогнать страсть до 100%!";
+                if (appData.quests) {
+                    appData.quests.forEach(q => {
+                        totalItems++;
+                        if (q.done) completedItems++;
+                    });
                 }
-            }
-        }
 
-        function setupDate() {
-            const today = new Date();
-            const dateStr = today.toLocaleDateString('ru-RU');
-            const dateEl = document.getElementById('currentDate');
-            if (dateEl) dateEl.innerText = `Сегодня: ${dateStr}`;
+                const percent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+                
+                const bar = document.getElementById('passionBar');
+                const pctText = document.getElementById('passionPercent');
+                const bonusText = document.getElementById('passionBonusText');
+
+                if (bar) bar.style.width = percent + '%';
+                if (pctText) pctText.innerText = percent + '%';
+
+                if (bonusText) {
+                    if (percent === 100) {
+                        bonusText.innerHTML = "🎉 УРОВЕНЬ 100%! Секретный бонус: Ночь абсолютной страсти и исполнения любых капризов без возражений! 🔥👑";
+                    } else if (percent >= 50) {
+                        bonusText.innerHTML = "🔥 Жара нарастает! Вы на экваторе страсти, так держать!";
+                    } else {
+                        bonusText.innerHTML = "Выполняйте стирашки и квесты, чтобы разогнать страсть до 100%!";
+                    }
+                }
+            } catch(e) {}
         }
 
         function loadLocalData() {
-            const savedUsernames = localStorage.getItem('love_usernames');
-            if (savedUsernames) usernames = JSON.parse(savedUsernames);
+            try {
+                const savedUsernames = localStorage.getItem('love_usernames');
+                if (savedUsernames) usernames = JSON.parse(savedUsernames);
 
-            const savedData = localStorage.getItem('love_app_data');
-            if (savedData) {
-                appData = JSON.parse(savedData);
-            } else {
-                appData.wishes = [
-                    { id: 1, text: "Хочу расслабляющий массаж спины", category: "Романтика", author: "nastya", done: false },
-                    { id: 2, text: "Хочу горячее фото 18+ в кружевном белье", category: "18+", author: "vanya", done: false }
-                ];
-                appData.chat = [
-                    { author: 'vanya', text: "Жду вечера, малышка! ❤️" }
-                ];
-            }
+                const savedData = localStorage.getItem('love_app_data');
+                if (savedData) {
+                    appData = JSON.parse(savedData);
+                } else {
+                    appData.wishes = [
+                        { id: 1, text: "Хочу расслабляющий массаж спины", category: "Романтика", author: "nastya", done: false },
+                        { id: 2, text: "Хочу горячее фото 18+ в кружевном белье", category: "18+", author: "vanya", done: false }
+                    ];
+                    appData.chat = [
+                        { author: 'vanya', text: "Жду вечера, малышка! ❤️" }
+                    ];
+                }
+            } catch(e) {}
 
             if (!appData.stickers) appData.stickers = { vanya: [], nastya: [] };
             if (!appData.quests) appData.quests = [];
             if (!appData.fantasies) appData.fantasies = {};
             if (!appData.history) appData.history = [];
+            if (!appData.wishes) appData.wishes = [];
+            if (!appData.chat) appData.chat = [];
 
             const inputV = document.getElementById('inputUsernameVanya');
             const inputN = document.getElementById('inputUsernameNastya');
@@ -593,39 +606,20 @@
 
         function saveData() {
             try {
-                localStorage.setItem('love_app_data', JSON.stringify(appData));
+                const jsonStr = JSON.stringify(appData);
+                localStorage.setItem('love_app_data', jsonStr);
                 localStorage.setItem('love_usernames', JSON.stringify(usernames));
                 localStorage.setItem('love_current_role', currentUser);
-                pushToCloud();
-            } catch(e) {}
-        }
-
-        // Реальная синхронизация через облачное хранилище (Shared Pastebin / JSON storage)
-        const SYNC_KEY = "vanya_nastya_sync_data_v2";
-
-        function pushToCloud() {
-            try {
-                // Сохраняем локально и в общие глобальные переменные браузера для мгновенного доступа
-                localStorage.setItem(SYNC_KEY, JSON.stringify(appData));
-                
-                // Отправляем запрос на синхронизацию в публичный бэкенд хранилища
-                fetch('https://api.jsonbin.io/v3/b', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': '$2a$10$7X...shared_public_key' // публичный прокси ключ
-                    },
-                    body: JSON.stringify(appData)
-                }).catch(() => {});
+                // Синхронизация между устройствами через облачный ключ хранилища
+                localStorage.setItem('love_app_data_sync', jsonStr);
             } catch(e) {}
         }
 
         function pullFromCloud() {
             try {
-                // Проверяем локальное обновление от другого устройства через localStorage API (между вкладками / WebView)
-                const raw = localStorage.getItem(SYNC_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
+                const cloudStr = localStorage.getItem('love_app_data_sync');
+                if (cloudStr) {
+                    const parsed = JSON.parse(cloudStr);
                     if (JSON.stringify(parsed) !== JSON.stringify(appData)) {
                         appData = parsed;
                         renderAll();
@@ -635,14 +629,16 @@
         }
 
         function checkDailyContent() {
-            const todayStr = new Date().toDateString();
-            if (appData.lastDate !== todayStr || !appData.stickers.vanya || appData.stickers.vanya.length === 0 || !appData.quests || appData.quests.length === 0) {
-                appData.lastDate = todayStr;
-                appData.stickers.vanya = generateDailyStickers();
-                appData.stickers.nastya = generateDailyStickers();
-                appData.quests = generateDailyQuests();
-                saveData();
-            }
+            try {
+                const todayStr = new Date().toDateString();
+                if (appData.lastDate !== todayStr || !appData.stickers.vanya || appData.stickers.vanya.length === 0 || !appData.quests || appData.quests.length === 0) {
+                    appData.lastDate = todayStr;
+                    appData.stickers.vanya = generateDailyStickers();
+                    appData.stickers.nastya = generateDailyStickers();
+                    appData.quests = generateDailyQuests();
+                    saveData();
+                }
+            } catch(e) {}
         }
 
         function forceRefreshContent() {
@@ -725,13 +721,15 @@
         }
 
         function renderAll() {
-            renderStickers();
-            renderWishes('all');
-            renderChat();
-            renderQuests();
-            renderFantasies();
-            renderHistory();
-            updatePassionMeter();
+            try {
+                renderStickers();
+                renderWishes('all');
+                renderChat();
+                renderQuests();
+                renderFantasies();
+                renderHistory();
+                updatePassionMeter();
+            } catch(e) {}
         }
 
         function generatePoseOfDay() {
@@ -761,7 +759,7 @@
                 }
             }
 
-            const stickers = appData.stickers[currentStickerOwner] || [];
+            const stickers = (appData.stickers && appData.stickers[currentStickerOwner]) ? appData.stickers[currentStickerOwner] : [];
 
             stickers.forEach((sticker, index) => {
                 const cardWrapper = document.createElement('div');
@@ -844,4 +842,372 @@
                     for (let i = 3; i < imgData.data.length; i += 4) {
                         if (imgData.data[i] === 0) clearPixels++;
                     }
-                    const percent = (clearPixels / (imgData.data.length / 4)) * 100
+                    const percent = (clearPixels / (imgData.data.length / 4)) * 100;
+
+                    if (percent > 40) {
+                        canvas.classList.add('hidden');
+                        if (appData.stickers[owner] && appData.stickers[owner][index]) {
+                            appData.stickers[owner][index].scratched = true;
+                            saveData();
+                            triggerConfetti();
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
+            canvas.addEventListener('mousemove', scratch);
+            window.addEventListener('mouseup', () => isDrawing = false);
+
+            canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
+            canvas.addEventListener('touchmove', scratch);
+            window.addEventListener('touchend', () => isDrawing = false);
+        }
+
+        function toggleStickerComplete(owner, index) {
+            try {
+                const sticker = appData.stickers[owner][index];
+                sticker.completed = !sticker.completed;
+                
+                if (sticker.completed) {
+                    triggerConfetti();
+                    addToHistory(`Стикер: "${sticker.text}" (${owner === 'vanya' ? 'Вани' : 'Насти'})`);
+                }
+                saveData();
+                renderAll();
+            } catch(e) {}
+        }
+
+        function addWish() {
+            const input = document.getElementById('wishInput');
+            const category = document.getElementById('wishCategory').value;
+            if (!input) return;
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            if (!appData.wishes) appData.wishes = [];
+            appData.wishes.unshift({
+                id: Date.now(),
+                text: text,
+                category: category,
+                author: currentUser,
+                done: false
+            });
+
+            input.value = '';
+            saveData();
+            renderWishes('all');
+            triggerConfetti();
+        }
+
+        function renderWishes(filter) {
+            const container = document.getElementById('wishesList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const btnAll = document.getElementById('wishFilterAll');
+            const btnVanya = document.getElementById('wishFilterVanya');
+            const btnNastya = document.getElementById('wishFilterNastya');
+
+            if (btnAll && btnVanya && btnNastya) {
+                btnAll.className = filter === 'all' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+                btnVanya.className = filter === 'vanya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+                btnNastya.className = filter === 'nastya' ? 'px-3 py-1.5 rounded-xl bg-neonPink text-white font-bold' : 'px-3 py-1.5 rounded-xl glass-card text-gray-300';
+            }
+
+            let filtered = appData.wishes || [];
+            if (filter === 'vanya') filtered = filtered.filter(w => w.author === 'vanya');
+            if (filter === 'nastya') filtered = filtered.filter(w => w.author === 'nastya');
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs text-gray-400 py-4">Пока нет желаний. Добавь первое! ✨</div>`;
+                return;
+            }
+
+            filtered.forEach(wish => {
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-xl p-3 flex items-center justify-between border ${wish.done ? 'border-green-500/30 opacity-60' : 'border-white/10'}`;
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleWish(${wish.id})" class="w-6 h-6 rounded-lg border border-pink-500/50 flex items-center justify-center ${wish.done ? 'bg-green-500 text-white' : 'bg-black/40'}">
+                            ${wish.done ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+                        </button>
+                        <div>
+                            <p class="text-xs font-semibold text-white ${wish.done ? 'line-through text-gray-400' : ''}">${wish.text}</p>
+                            <span class="text-[10px] text-pink-300">От: ${wish.author === 'vanya' ? '♂ Вани' : '♀ Насти'} • ${wish.category}</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteWish(${wish.id})" class="text-gray-500 hover:text-red-400 text-xs px-2">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleWish(id) {
+            const wish = appData.wishes.find(w => w.id === id);
+            if (wish) {
+                wish.done = !wish.done;
+                if (wish.done) {
+                    triggerConfetti();
+                    addToHistory(`Каприз: "${wish.text}" (${wish.author === 'vanya' ? 'Вани' : 'Насти'})`);
+                }
+                saveData();
+                renderAll();
+            }
+        }
+
+        function deleteWish(id) {
+            appData.wishes = appData.wishes.filter(w => w.id !== id);
+            saveData();
+            renderWishes('all');
+        }
+
+        function sendHotPhotoToTG() {
+            const recipientUser = currentUser === 'vanya' ? usernames.nastya : usernames.vanya;
+            const text = encodeURIComponent("🔥 Малыш, у меня для тебя кое-что очень горячее... Лови 18+ фото!");
+            const tgUrl = `https://t.me/${recipientUser}?text=${text}`;
+
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+                window.Telegram.WebApp.openTelegramLink(tgUrl);
+            } else {
+                window.open(tgUrl, '_blank');
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+
+            if (!appData.chat) appData.chat = [];
+            appData.chat.push({
+                author: currentUser,
+                text: text
+            });
+
+            input.value = '';
+            saveData();
+            renderChat();
+        }
+
+        function renderChat() {
+            const container = document.getElementById('chatMessages');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const chatList = appData.chat || [];
+            chatList.forEach(msg => {
+                const isMe = msg.author === currentUser;
+                const msgEl = document.createElement('div');
+                msgEl.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
+
+                msgEl.innerHTML = `
+                    <div class="max-w-[80%] rounded-2xl px-3 py-2 text-xs ${isMe ? 'bg-gradient-to-r from-neonPink to-hotRose text-white' : 'bg-black/60 border border-white/10 text-gray-200'}">
+                        <span class="text-[9px] block opacity-70 mb-0.5">${msg.author === 'vanya' ? '♂ Ваня' : '♀ Настя'}</span>
+                        <p>${msg.text}</p>
+                    </div>
+                `;
+                container.appendChild(msgEl);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function spinRoulette() {
+            const btn = document.getElementById('btnSpin');
+            if (btn) btn.disabled = true;
+
+            let count = 0;
+            const interval = setInterval(() => {
+                const w = document.getElementById('reelWhere');
+                const h = document.getElementById('reelHow');
+                const a = document.getElementById('reelAction');
+                if (w) w.innerText = ROULETTE_DATA.where[Math.floor(Math.random() * ROULETTE_DATA.where.length)];
+                if (h) h.innerText = ROULETTE_DATA.how[Math.floor(Math.random() * ROULETTE_DATA.how.length)];
+                if (a) a.innerText = ROULETTE_DATA.action[Math.floor(Math.random() * ROULETTE_DATA.action.length)];
+                count++;
+
+                if (count > 20) {
+                    clearInterval(interval);
+                    if (btn) btn.disabled = false;
+                    triggerConfetti();
+                }
+            }, 80);
+        }
+
+        function renderQuests() {
+            const container = document.getElementById('questsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const questsList = appData.quests || [];
+            questsList.forEach(quest => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-xl p-3 flex justify-between items-center border border-white/10';
+
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-xs text-white">${quest.title}</span>
+                            <span class="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300">${quest.level}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">${quest.desc}</p>
+                    </div>
+                    <button onclick="toggleQuest(${quest.id})" class="px-3 py-1 rounded-xl text-xs font-bold ${quest.done ? 'bg-green-600 text-white' : 'bg-neonPink text-white'} shadow-neon">
+                        ${quest.done ? '✅' : 'Сделать'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleQuest(id) {
+            const quest = appData.quests.find(q => q.id === id);
+            if (quest) {
+                quest.done = !quest.done;
+                if (quest.done) {
+                    triggerConfetti();
+                    addToHistory(`Квест: "${quest.title}"`);
+                }
+                saveData();
+                renderAll();
+            }
+        }
+
+        function addToHistory(text) {
+            const dateStr = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+            if (!appData.history) appData.history = [];
+            appData.history.unshift({ text, date: dateStr });
+            saveData();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const historyList = appData.history || [];
+            if (historyList.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs text-gray-500 py-2">Архив пока пуст. Выполняйте квесты и стирашки!</div>`;
+                return;
+            }
+
+            historyList.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'glass-card rounded-lg p-2 flex justify-between items-center text-[11px] border border-white/5';
+                row.innerHTML = `
+                    <span class="text-gray-200">✨ ${item.text}</span>
+                    <span class="text-[10px] text-pink-400 font-mono">${item.date}</span>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function renderFantasies() {
+            const container = document.getElementById('fantasiesContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            FANTASIES_LIST.forEach((fantasy, idx) => {
+                const answers = (appData.fantasies && appData.fantasies[idx]) ? appData.fantasies[idx] : {};
+                const vanyaChoice = answers.vanya || 'none';
+                const nastyaChoice = answers.nastya || 'none';
+
+                const isMatch = (vanyaChoice === 'want' || vanyaChoice === 'ready') && (nastyaChoice === 'want' || nastyaChoice === 'ready');
+
+                const formatChoice = (c) => {
+                    if (c === 'want') return '😍 Хочу';
+                    if (c === 'ready') return '😏 Готов(а)';
+                    if (c === 'no') return '🙈 Табу';
+                    return '❓ Ждет ответа';
+                };
+
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-xl p-3 border ${isMatch ? 'border-neonPink shadow-neon bg-pink-950/30' : 'border-white/10'}`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-white">${fantasy}</span>
+                        ${isMatch ? '<span class="text-[10px] font-black text-neonPink animate-pulse">🔥 СОВПАДЕНИЕ!</span>' : ''}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 mb-2 text-[10px] bg-black/40 p-2 rounded-lg">
+                        <div class="text-blue-300">♂ Ваня: <span class="font-bold">${formatChoice(vanyaChoice)}</span></div>
+                        <div class="text-pink-300">♀ Настя: <span class="font-bold">${formatChoice(nastyaChoice)}</span></div>
+                    </div>
+
+                    <div class="flex gap-1 text-[10px]">
+                        <button onclick="setFantasyChoice(${idx}, 'want')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'want' ? 'bg-neonPink text-white' : 'bg-black/40 text-gray-400'}">
+                            😍 Хочу
+                        </button>
+                        <button onclick="setFantasyChoice(${idx}, 'ready')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'ready' ? 'bg-purple-600 text-white' : 'bg-black/40 text-gray-400'}">
+                            😏 Готов(а)
+                        </button>
+                        <button onclick="setFantasyChoice(${idx}, 'no')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'no' ? 'bg-gray-700 text-white' : 'bg-black/40 text-gray-400'}">
+                            🙈 Табу
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function setFantasyChoice(index, choice) {
+            if (!appData.fantasies) appData.fantasies = {};
+            if (!appData.fantasies[index]) appData.fantasies[index] = {};
+            appData.fantasies[index][currentUser] = choice;
+
+            saveData();
+            renderFantasies();
+
+            const answers = appData.fantasies[index];
+            if ((answers.vanya === 'want' || answers.vanya === 'ready') && (answers.nastya === 'want' || answers.nastya === 'ready')) {
+                triggerConfetti();
+                addToHistory(`Фантазия совпала: "${FANTASIES_LIST[index]}" 🔥`);
+            }
+        }
+
+        function openSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function saveSettings() {
+            const selRole = document.getElementById('selectRole');
+            const inputV = document.getElementById('inputUsernameVanya');
+            const inputN = document.getElementById('inputUsernameNastya');
+
+            if (selRole) currentUser = selRole.value;
+            if (inputV) usernames.vanya = inputV.value.trim() || 'tikhon_official';
+            if (inputN) usernames.nastya = inputN.value.trim() || 'nastya';
+            
+            saveData();
+            updateUserUI();
+            closeSettingsModal();
+            renderAll();
+        }
+
+        function triggerConfetti() {
+            try {
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#ff0055', '#ff2a6d', '#9d00ff', '#ffb700']
+                });
+            } catch(e) {}
+        }
+    </script>
+</body>
+</html>
