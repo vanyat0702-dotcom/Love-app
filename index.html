@@ -118,50 +118,73 @@
         <div class="absolute bottom-1/3 right-1/4 w-80 h-80 bg-neonPurple/10 rounded-full blur-3xl pulse-bg" style="animation-delay: 2s;"></div>
     </div>
 
+    <!-- Ping Notification Overlay -->
+    <div id="pingOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <div class="w-20 h-20 rounded-full bg-neonPink/30 flex items-center justify-center text-neonPink text-4xl animate-bounce shadow-glow">
+            <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <h2 class="text-xl font-black text-white" id="pingTitle">Вам пинг!</h2>
+        <p class="text-sm text-pink-200" id="pingText">Ваня думает о тебе прямо сейчас ❤️</p>
+        <button onclick="closePingModal()" class="px-6 py-2.5 rounded-xl bg-neonPink text-white font-bold text-xs shadow-neon">
+            Улыбнуться и закрыть 💕
+        </button>
+    </div>
+
     <div class="relative z-10 max-w-md mx-auto px-4 pt-4">
 
-        <!-- Header / User Switcher + Счетчик дней вместе -->
-        <header class="glass-panel rounded-2xl p-3 mb-4 shadow-neon flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-neonPink to-neonPurple p-[2px] shadow-glow">
-                    <div class="w-full h-full bg-velvet rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-heart-fire text-neonPink text-lg"></i>
+        <!-- Header / User Switcher + Счетчик дней вместе + Таймер до свидания -->
+        <header class="glass-panel rounded-2xl p-3 mb-4 shadow-neon space-y-2">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-neonPink to-neonPurple p-[2px] shadow-glow">
+                        <div class="w-full h-full bg-velvet rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-heart-fire text-neonPink text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-xs font-bold uppercase tracking-widest text-pink-300">Love & Passion 18+</h1>
+                        <p class="text-[10px] text-pink-400 font-semibold">💕 Вместе: <span id="daysCount">1500</span> дней</p>
                     </div>
                 </div>
-                <div>
-                    <h1 class="text-xs font-bold uppercase tracking-widest text-pink-300">Love & Passion 18+</h1>
-                    <p class="text-[10px] text-pink-400 font-semibold" id="daysTogetherCounter">💕 Вместе: <span id="daysCount">1500</span> дней</p>
+
+                <!-- Profile Selector Toggle -->
+                <div class="flex bg-black/40 p-1 rounded-xl border border-white/10">
+                    <button id="btnUserVanya" onclick="setUser('vanya')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+                        <i class="fa-solid fa-mars text-blue-400"></i> Ваня
+                    </button>
+                    <button id="btnUserNastya" onclick="setUser('nastya')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+                        <i class="fa-solid fa-venus text-pink-400"></i> Настя
+                    </button>
                 </div>
-            </div>
 
-            <!-- Profile Selector Toggle -->
-            <div class="flex bg-black/40 p-1 rounded-xl border border-white/10">
-                <button id="btnUserVanya" onclick="setUser('vanya')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
-                    <i class="fa-solid fa-mars text-blue-400"></i> Ваня
-                </button>
-                <button id="btnUserNastya" onclick="setUser('nastya')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
-                    <i class="fa-solid fa-venus text-pink-400"></i> Настя
+                <!-- Settings Cog -->
+                <button onclick="openSettingsModal()" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition">
+                    <i class="fa-solid fa-gear text-sm"></i>
                 </button>
             </div>
 
-            <!-- Settings Cog -->
-            <button onclick="openSettingsModal()" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition">
-                <i class="fa-solid fa-gear text-sm"></i>
-            </button>
+            <!-- Таймер до свидания / вечера пятницы -->
+            <div class="bg-black/40 rounded-xl px-3 py-1.5 flex justify-between items-center text-[11px] border border-pink-500/20">
+                <span class="text-gray-300"><i class="fa-solid fa-clock text-neonGold mr-1"></i> До вечера пятницы:</span>
+                <span id="fridayTimer" class="font-bold text-pink-300 font-mono">00д 00ч 00м</span>
+            </div>
         </header>
 
-        <!-- Индикатор «Уровня страсти» (Love Meter) -->
+        <!-- Индикатор «Уровня страсти» + Звание пары + Кто балует -->
         <div class="glass-panel rounded-2xl p-3 mb-4 space-y-2 border border-pink-500/30">
             <div class="flex justify-between items-center text-xs">
                 <span class="font-bold text-white flex items-center gap-1">
-                    <i class="fa-solid fa-fire text-neonPink"></i> Уровень Страсти
+                    <i class="fa-solid fa-fire text-neonPink"></i> Уровень Страсти (<span id="coupleRankName" class="text-neonGold">Новички</span>)
                 </span>
                 <span id="passionPercent" class="font-black text-pink-400">0%</span>
             </div>
             <div class="w-full bg-black/60 h-3 rounded-full overflow-hidden p-0.5 border border-white/10">
                 <div id="passionBar" class="bg-gradient-to-r from-neonPink via-hotRose to-neonGold h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
             </div>
-            <p id="passionBonusText" class="text-[10px] text-gray-300 text-center">Выполняйте стирашки и квесты, чтобы зажечь страсть до 100%! 🔥</p>
+            
+            <div id="whoTreatsToday" class="bg-black/40 rounded-xl p-2 text-center text-xs font-bold text-pink-200 border border-pink-500/20">
+                🎁 Сегодня балует: <span id="todayTreatName" class="text-neonPink">Загрузка...</span>
+            </div>
         </div>
 
         <!-- Dynamic Content Tabs -->
@@ -191,8 +214,21 @@
             <div id="scratchCardsContainer" class="space-y-4"></div>
         </section>
 
-        <!-- TAB 2: WISHLIST -->
+        <!-- TAB 2: WISHLIST + КОЛЕСО ФОРТУНЫ КАПРИЗОВ -->
         <section id="tab-wishes" class="tab-content hidden space-y-4">
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-2 border border-yellow-500/30">
+                <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-dharmachakra text-neonGold"></i>
+                    Колесо Фортуны Капризов
+                </h3>
+                <div id="fortuneWishResult" class="bg-black/50 p-3 rounded-xl border border-white/10 text-xs text-yellow-200 min-h-[45px] flex items-center justify-center font-medium">
+                    Нажми кнопку, чтобы случайный каприз выбрал себя сам!
+                </div>
+                <button onclick="spinFortuneWish()" class="w-full py-2 rounded-xl bg-gradient-to-r from-neonGold to-hotRose font-bold text-xs text-black shadow-neon-gold">
+                    🎰 Крутить рулетку капризов
+                </button>
+            </div>
+
             <div class="glass-panel rounded-2xl p-4">
                 <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-3">
                     <i class="fa-solid fa-star text-neonGold"></i>
@@ -225,8 +261,20 @@
             <div id="wishesList" class="space-y-3"></div>
         </section>
 
-        <!-- TAB 3: CHAT & HOT PHOTO LINK -->
+        <!-- TAB 3: CHAT & PING & HOT PHOTO LINK -->
         <section id="tab-chat" class="tab-content hidden space-y-4">
+            <!-- Кнопка отправки Пинга -->
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-2 border border-pink-500/40">
+                <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-heart-pulse text-neonPink"></i>
+                    Напоминалка-Поцелуй (Пинг)
+                </h3>
+                <p class="text-[11px] text-gray-300">Нажми, чтобы у партнера на экране вспыхнуло сердце:</p>
+                <button onclick="sendPing()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-neonPink to-hotRose text-white font-bold text-xs shadow-neon flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Сделать Пинг партнеру ❤️
+                </button>
+            </div>
+
             <div class="glass-panel rounded-2xl p-5 text-center space-y-3 border-2 border-neonPink/50 shadow-neon">
                 <div class="inline-flex p-3 rounded-full bg-neonPink/20 text-neonPink mb-1">
                     <i class="fa-solid fa-fire-flame-curved text-3xl"></i>
@@ -260,9 +308,40 @@
             </div>
         </section>
 
-        <!-- TAB 4: QUESTS & ROULETTE + ПОЗА ДНЯ + ИСТОРИЯ -->
+        <!-- TAB 4: QUESTS & ROULETTE + ПЛАНЫ НА ВЕЧЕР + КАЛЕНДАРЬ -->
         <section id="tab-quests" class="tab-content hidden space-y-5">
-            <!-- 1. Случайная поза / Мини-игра «Поза дня» -->
+            <!-- 1. Планы на вечер (История совпадений фантазий) -->
+            <div class="glass-panel rounded-2xl p-4 space-y-2 border border-neonPink/40">
+                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-neonPink"></i>
+                    🔥 Планы на вечер (Совпавшие фантазии)
+                </h3>
+                <p class="text-[11px] text-gray-300">То, что вы оба хотите или к чему готовы на сегодня:</p>
+                <div id="eveningPlansContainer" class="space-y-1.5">
+                    <div class="text-center text-xs text-gray-500 py-2">Пока нет совпадений. Выбирайте фантазии ниже!</div>
+                </div>
+            </div>
+
+            <!-- 2. Горячий календарь событий -->
+            <div class="glass-panel rounded-2xl p-4 space-y-2">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days text-pink-400"></i>
+                    Горячий Календарь Событий 📅
+                </h3>
+                <p class="text-[11px] text-gray-300" id="calendarMonthTitle">Дни активности за текущий месяц:</p>
+                <div id="hotCalendarGrid" class="grid grid-cols-7 gap-1.5 pt-1 text-center text-xs"></div>
+            </div>
+
+            <!-- 3. Купоны на желания -->
+            <div class="glass-panel rounded-2xl p-4 space-y-3">
+                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-ticket text-neonPink"></i>
+                    Интерактивные Купоны на Желания 🎟️
+                </h3>
+                <div id="couponsContainer" class="grid grid-cols-1 gap-2"></div>
+            </div>
+
+            <!-- 4. Поза Дня -->
             <div class="glass-panel rounded-2xl p-4 text-center space-y-2 border border-purple-500/30">
                 <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
                     <i class="fa-solid fa-venus-mars text-neonPink"></i>
@@ -276,7 +355,7 @@
                 </button>
             </div>
 
-            <!-- 2. Passion Roulette -->
+            <!-- 5. Passion Roulette -->
             <div class="glass-panel rounded-2xl p-4 text-center space-y-3">
                 <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
                     <i class="fa-solid fa-dice text-neonGold text-base"></i>
@@ -303,36 +382,32 @@
                 </button>
             </div>
 
-            <!-- 3. Quests Progress -->
+            <!-- 6. Quests Progress -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-trophy text-neonGold"></i>
-                    Ежедневные Квесты & Челленджи (60/40)
+                    Ежедневные Квесты & Челленджи
                 </h3>
                 <div id="questsContainer" class="space-y-2"></div>
             </div>
 
-            <!-- 4. История выполненных квестов / Лента воспоминаний -->
+            <!-- 7. Лента Воспоминаний -->
             <div class="glass-panel rounded-2xl p-4 space-y-2">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-scroll text-pink-400"></i>
                     Лента Воспоминаний (Архив) 📜
                 </h3>
-                <p class="text-[11px] text-gray-300">Здесь сохраняется всё, что вы уже выполнили:</p>
                 <div id="historyContainer" class="space-y-2 max-h-40 overflow-y-auto pr-1">
                     <div class="text-center text-xs text-gray-500 py-2">Архив пока пуст. Выполняйте квесты и стирашки!</div>
                 </div>
             </div>
 
-            <!-- 5. Fantasies Matcher -->
+            <!-- 8. Fantasies Matcher -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-masks-theater text-neonPink"></i>
                     Детектор Совпадения Фантазий
                 </h3>
-                <p class="text-[11px] text-gray-300">
-                    Здесь видно выбор каждого из вас! При совпадении загорится пламя 🔥.
-                </p>
                 <div id="fantasiesContainer" class="space-y-3 pt-1"></div>
             </div>
         </section>
@@ -411,7 +486,7 @@
         </div>
     </div>
 
-    <!-- JS App Logic with Daily Rotation & Vercel Sync -->
+    <!-- JS App Logic with All Features & Cloud Sync -->
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
             try {
@@ -476,6 +551,13 @@
             "Публичный риск (в машине / на природе)"
         ];
 
+        const INITIAL_COUPONS = [
+            { id: 1, title: "☕ Утренний кофе в постель", used: false },
+            { id: 2, title: "💆‍♂️ Массаж спины 20 минут", used: false },
+            { id: 3, title: "🔥 Исполнение любого каприза вне очереди", used: false },
+            { id: 4, title: "💋 100 поцелуев без остановки", used: false }
+        ];
+
         let currentUser = localStorage.getItem('love_current_role') || 'vanya';
         let currentStickerOwner = 'vanya';
         let usernames = { vanya: 'tikhon_official', nastya: 'nastya' };
@@ -487,7 +569,10 @@
             chat: [],
             quests: [],
             fantasies: {},
-            history: []
+            activeFantasies: [],
+            coupons: [],
+            history: [],
+            activeDates: {} // Для календаря
         };
 
         window.onload = function() {
@@ -495,11 +580,11 @@
                 loadLocalData();
                 checkDailyContent();
                 calculateDaysTogether();
+                startFridayTimer();
                 renderAll();
                 pullFromCloud();
             } catch(e) {}
             
-            // Синхронизация данных с сервером каждые 2.5 секунды
             setInterval(pullFromCloud, 2500);
         };
 
@@ -515,6 +600,27 @@
                 const countEl = document.getElementById('daysCount');
                 if (countEl) countEl.innerText = "1500";
             }
+        }
+
+        function startFridayTimer() {
+            setInterval(() => {
+                const now = new Date();
+                const resultTime = new Date();
+                resultTime.setDate(now.getDate() + (5 + 7 - now.getDay()) % 7);
+                resultTime.setHours(19, 0, 0, 0); // Пятница 19:00
+
+                if (now > resultTime) resultTime.setDate(resultTime.getDate() + 7);
+
+                const diff = resultTime - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const mins = Math.floor((diff / 1000 / 60) % 60);
+
+                const timerEl = document.getElementById('fridayTimer');
+                if (timerEl) {
+                    timerEl.innerText = `${days}д ${hours}ч ${mins}м`;
+                }
+            }, 1000);
         }
 
         function updatePassionMeter() {
@@ -542,19 +648,23 @@
                 
                 const bar = document.getElementById('passionBar');
                 const pctText = document.getElementById('passionPercent');
-                const bonusText = document.getElementById('passionBonusText');
+                const rankEl = document.getElementById('coupleRankName');
 
                 if (bar) bar.style.width = percent + '%';
                 if (pctText) pctText.innerText = percent + '%';
 
-                if (bonusText) {
-                    if (percent === 100) {
-                        bonusText.innerHTML = "🎉 УРОВЕНЬ 100%! Секретный бонус: Ночь абсолютной страсти и исполнения любых капризов без возражений! 🔥👑";
-                    } else if (percent >= 50) {
-                        bonusText.innerHTML = "🔥 Жара нарастает! Вы на экваторе страсти, так держать!";
-                    } else {
-                        bonusText.innerHTML = "Выполняйте стирашки и квесты, чтобы разогнать страсть до 100%!";
-                    }
+                if (rankEl) {
+                    if (percent >= 80) rankEl.innerText = "🔥 Мастера Страсти";
+                    else if (percent >= 50) rankEl.innerText = "💖 Неразлучники";
+                    else if (percent >= 25) rankEl.innerText = "🌶️ Горячая пара";
+                    else rankEl.innerText = "🌱 Новички";
+                }
+
+                const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+                const treatNameEl = document.getElementById('todayTreatName');
+                if (treatNameEl) {
+                    const todayPerson = dayOfYear % 2 === 0 ? '♂ Ваня' : '♀ Настя';
+                    treatNameEl.innerText = todayPerson;
                 }
             } catch(e) {}
         }
@@ -575,15 +685,19 @@
                     appData.chat = [
                         { author: 'vanya', text: "Жду вечера, малышка! ❤️" }
                     ];
+                    appData.coupons = JSON.parse(JSON.stringify(INITIAL_COUPONS));
                 }
             } catch(e) {}
 
             if (!appData.stickers) appData.stickers = { vanya: [], nastya: [] };
             if (!appData.quests) appData.quests = [];
             if (!appData.fantasies) appData.fantasies = {};
+            if (!appData.activeFantasies || appData.activeFantasies.length === 0) appData.activeFantasies = FANTASIES_LIST.slice(0, 4);
+            if (!appData.coupons || appData.coupons.length === 0) appData.coupons = JSON.parse(JSON.stringify(INITIAL_COUPONS));
             if (!appData.history) appData.history = [];
             if (!appData.wishes) appData.wishes = [];
             if (!appData.chat) appData.chat = [];
+            if (!appData.activeDates) appData.activeDates = {};
 
             const inputV = document.getElementById('inputUsernameVanya');
             const inputN = document.getElementById('inputUsernameNastya');
@@ -595,7 +709,6 @@
             updateUserUI();
         }
 
-        // Сохранение данных локально и отправка на сервер Vercel
         function saveData() {
             try {
                 const jsonStr = JSON.stringify(appData);
@@ -611,7 +724,6 @@
             } catch(e) {}
         }
 
-        // Запрос данных с сервера Vercel
         function pullFromCloud() {
             try {
                 fetch('/api/sync')
@@ -629,7 +741,6 @@
             } catch(e) {}
         }
 
-        // Проверка смены дня для автоматического обновления квестов и стирашек
         function checkDailyContent() {
             try {
                 const todayStr = new Date().toDateString();
@@ -638,6 +749,7 @@
                     appData.stickers.vanya = generateDailyStickers();
                     appData.stickers.nastya = generateDailyStickers();
                     appData.quests = generateDailyQuests();
+                    appData.activeFantasies = [...FANTASIES_LIST].sort(() => 0.5 - Math.random()).slice(0, 4);
                     saveData();
                 }
             } catch(e) {}
@@ -647,6 +759,7 @@
             appData.stickers.vanya = generateDailyStickers();
             appData.stickers.nastya = generateDailyStickers();
             appData.quests = generateDailyQuests();
+            appData.activeFantasies = [...FANTASIES_LIST].sort(() => 0.5 - Math.random()).slice(0, 4);
             saveData();
             renderAll();
             closeSettingsModal();
@@ -699,12 +812,12 @@
             if (!btnV || !btnN) return;
 
             btnV.className = currentUser === 'vanya' 
-                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
-                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
+                ? 'px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
+                : 'px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
 
             btnN.className = currentUser === 'nastya' 
-                ? 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
-                : 'px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
+                ? 'px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 bg-neonPink text-white shadow-neon'
+                : 'px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-gray-400';
         }
 
         function switchStickerOwner(owner) {
@@ -728,10 +841,52 @@
                 renderWishes('all');
                 renderChat();
                 renderQuests();
+                renderCoupons();
                 renderFantasies();
+                renderEveningPlans();
+                renderCalendar();
                 renderHistory();
                 updatePassionMeter();
             } catch(e) {}
+        }
+
+        function markTodayActive() {
+            const todayKey = new Date().toISOString().split('T')[0];
+            if (!appData.activeDates) appData.activeDates = {};
+            appData.activeDates[todayKey] = true;
+        }
+
+        function sendPing() {
+            const senderName = currentUser === 'vanya' ? 'Ваня' : 'Настя';
+            const recipientRole = currentUser === 'vanya' ? 'nastya' : 'vanya';
+            
+            if (!appData.pings) appData.pings = {};
+            appData.pings[recipientRole] = { sender: senderName, time: Date.now() };
+            saveData();
+            triggerConfetti();
+        }
+
+        function checkPing() {
+            if (appData.pings && appData.pings[currentUser]) {
+                const ping = appData.pings[currentUser];
+                if (Date.now() - ping.time < 15000) { // Актуально 15 секунд
+                    const overlay = document.getElementById('pingOverlay');
+                    const textEl = document.getElementById('pingText');
+                    if (overlay && textEl) {
+                        textEl.innerText = `${ping.sender} думает о тебе прямо сейчас ❤️`;
+                        overlay.classList.remove('hidden');
+                    }
+                }
+            }
+        }
+
+        function closePingModal() {
+            const overlay = document.getElementById('pingOverlay');
+            if (overlay) overlay.classList.add('hidden');
+            if (appData.pings) {
+                appData.pings[currentUser] = null;
+                saveData();
+            }
         }
 
         function generatePoseOfDay() {
@@ -740,6 +895,22 @@
             if (box) {
                 box.innerHTML = `<span class="text-white font-bold">${randomPose}</span>`;
             }
+            markTodayActive();
+            triggerConfetti();
+        }
+
+        function spinFortuneWish() {
+            if (!appData.wishes || appData.wishes.length === 0) {
+                const box = document.getElementById('fortuneWishResult');
+                if (box) box.innerText = "Сначала добавьте капризы в книгу ниже!";
+                return;
+            }
+            const randomWish = appData.wishes[Math.floor(Math.random() * appData.wishes.length)];
+            const box = document.getElementById('fortuneWishResult');
+            if (box) {
+                box.innerHTML = `<span class="text-white font-bold">✨ Выпало исполнить: «${randomWish.text}» (${randomWish.author === 'vanya' ? 'Вани' : 'Насти'})</span>`;
+            }
+            markTodayActive();
             triggerConfetti();
         }
 
@@ -872,6 +1043,7 @@
                 sticker.completed = !sticker.completed;
                 
                 if (sticker.completed) {
+                    markTodayActive();
                     triggerConfetti();
                     addToHistory(`Стикер: "${sticker.text}" (${owner === 'vanya' ? 'Вани' : 'Насти'})`);
                 }
@@ -898,6 +1070,7 @@
             });
 
             input.value = '';
+            markTodayActive();
             saveData();
             renderWishes('all');
             triggerConfetti();
@@ -954,6 +1127,7 @@
             if (wish) {
                 wish.done = !wish.done;
                 if (wish.done) {
+                    markTodayActive();
                     triggerConfetti();
                     addToHistory(`Каприз: "${wish.text}" (${wish.author === 'vanya' ? 'Вани' : 'Насти'})`);
                 }
@@ -993,6 +1167,7 @@
             });
 
             input.value = '';
+            markTodayActive();
             saveData();
             renderChat();
         }
@@ -1037,6 +1212,7 @@
                 if (count > 20) {
                     clearInterval(interval);
                     if (btn) btn.disabled = false;
+                    markTodayActive();
                     triggerConfetti();
                 }
             }, 80);
@@ -1073,8 +1249,44 @@
             if (quest) {
                 quest.done = !quest.done;
                 if (quest.done) {
+                    markTodayActive();
                     triggerConfetti();
                     addToHistory(`Квест: "${quest.title}"`);
+                }
+                saveData();
+                renderAll();
+            }
+        }
+
+        function renderCoupons() {
+            const container = document.getElementById('couponsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!appData.coupons) appData.coupons = JSON.parse(JSON.stringify(INITIAL_COUPONS));
+
+            appData.coupons.forEach(coupon => {
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-xl p-2.5 flex justify-between items-center border ${coupon.used ? 'border-green-500/30 opacity-60' : 'border-pink-500/30'}`;
+
+                card.innerHTML = `
+                    <span class="text-xs font-bold text-white ${coupon.used ? 'line-through text-gray-400' : ''}">${coupon.title}</span>
+                    <button onclick="useCoupon(${coupon.id})" class="px-2.5 py-1 rounded-lg text-xs font-bold ${coupon.used ? 'bg-green-600 text-white' : 'bg-gradient-to-r from-neonPink to-hotRose text-white'} shadow-neon">
+                        ${coupon.used ? '✅ Активирован' : 'Активировать'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function useCoupon(id) {
+            const coupon = appData.coupons.find(c => c.id === id);
+            if (coupon) {
+                coupon.used = !coupon.used;
+                if (coupon.used) {
+                    markTodayActive();
+                    triggerConfetti();
+                    addToHistory(`Купон активирован: "${coupon.title}"`);
                 }
                 saveData();
                 renderAll();
@@ -1115,8 +1327,10 @@
             if (!container) return;
             container.innerHTML = '';
 
-            FANTASIES_LIST.forEach((fantasy, idx) => {
-                const answers = (appData.fantasies && appData.fantasies[idx]) ? appData.fantasies[idx] : {};
+            const currentFantasies = appData.activeFantasies && appData.activeFantasies.length > 0 ? appData.activeFantasies : FANTASIES_LIST.slice(0, 4);
+
+            currentFantasies.forEach((fantasy, idx) => {
+                const answers = (appData.fantasies && appData.fantasies[fantasy]) ? appData.fantasies[fantasy] : {};
                 const vanyaChoice = answers.vanya || 'none';
                 const nastyaChoice = answers.nastya || 'none';
 
@@ -1144,13 +1358,13 @@
                     </div>
 
                     <div class="flex gap-1 text-[10px]">
-                        <button onclick="setFantasyChoice(${idx}, 'want')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'want' ? 'bg-neonPink text-white' : 'bg-black/40 text-gray-400'}">
+                        <button onclick="setFantasyChoice('${fantasy}', 'want')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'want' ? 'bg-neonPink text-white' : 'bg-black/40 text-gray-400'}">
                             😍 Хочу
                         </button>
-                        <button onclick="setFantasyChoice(${idx}, 'ready')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'ready' ? 'bg-purple-600 text-white' : 'bg-black/40 text-gray-400'}">
+                        <button onclick="setFantasyChoice('${fantasy}', 'ready')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'ready' ? 'bg-purple-600 text-white' : 'bg-black/40 text-gray-400'}">
                             😏 Готов(а)
                         </button>
-                        <button onclick="setFantasyChoice(${idx}, 'no')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'no' ? 'bg-gray-700 text-white' : 'bg-black/40 text-gray-400'}">
+                        <button onclick="setFantasyChoice('${fantasy}', 'no')" class="flex-1 py-1 rounded-lg ${answers[currentUser] === 'no' ? 'bg-gray-700 text-white' : 'bg-black/40 text-gray-400'}">
                             🙈 Табу
                         </button>
                     </div>
@@ -1160,18 +1374,99 @@
             });
         }
 
-        function setFantasyChoice(index, choice) {
-            if (!appData.fantasies) appData.fantasies = {};
-            if (!appData.fantasies[index]) appData.fantasies[index] = {};
-            appData.fantasies[index][currentUser] = choice;
+        function renderEveningPlans() {
+            const container = document.getElementById('eveningPlansContainer');
+            if (!container) return;
+            container.innerHTML = '';
 
+            let matches = [];
+            if (appData.fantasies) {
+                Object.keys(appData.fantasies).forEach(fantasy => {
+                    const ans = appData.fantasies[fantasy];
+                    const v = ans.vanya;
+                    const n = ans.nastya;
+                    if ((v === 'want' || v === 'ready') && (n === 'want' || n === 'ready')) {
+                        matches.push(fantasy);
+                    }
+                });
+            }
+
+            if (matches.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs text-gray-500 py-2">Пока нет совместных совпадений. Выбирайте «Хочу» в детекторе ниже!</div>`;
+                return;
+            }
+
+            matches.forEach(match => {
+                const item = document.createElement('div');
+                item.className = 'glass-card rounded-lg p-2 flex items-center justify-between text-xs border border-neonPink/30 text-pink-200';
+                item.innerHTML = `<span>🔥 ${match}</span> <span class="text-[10px] bg-neonPink/20 px-2 py-0.5 rounded text-white font-bold">Одобрено обоими</span>`;
+                container.appendChild(item);
+            });
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('hotCalendarGrid');
+            const title = document.getElementById('calendarMonthTitle');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            if (title) title.innerText = `Активность за ${monthNames[month]} ${year}:`;
+
+            // Шапка дней недели
+            ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].forEach(d => {
+                const header = document.createElement('div');
+                header.className = 'text-[10px] font-bold text-gray-500';
+                header.innerText = d;
+                grid.appendChild(header);
+            });
+
+            // Пустые ячейки для сдвига месяца
+            let firstDay = new Date(year, month, 1).getDay();
+            firstDay = firstDay === 0 ? 6 : firstDay - 1;
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                grid.appendChild(empty);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayStr = String(day).padStart(2, '0');
+                const monthStr = String(month + 1).padStart(2, '0');
+                const dateKey = `${year}-${monthStr}-${dayStr}`;
+
+                const isActive = appData.activeDates && appData.activeDates[dateKey];
+                const isToday = day === now.getDate();
+
+                const cell = document.createElement('div');
+                cell.className = `p-1 rounded-lg text-xs flex flex-col items-center justify-center border ${isToday ? 'border-neonPink' : 'border-white/5'} ${isActive ? 'bg-pink-950/50 text-pink-200' : 'bg-black/40 text-gray-400'}`;
+                
+                cell.innerHTML = `
+                    <span class="text-[10px] font-bold">${day}</span>
+                    <span class="text-[10px]">${isActive ? '❤️' : ''}</span>
+                `;
+                grid.appendChild(cell);
+            }
+        }
+
+        function setFantasyChoice(fantasyName, choice) {
+            if (!appData.fantasies) appData.fantasies = {};
+            if (!appData.fantasies[fantasyName]) appData.fantasies[fantasyName] = {};
+            appData.fantasies[fantasyName][currentUser] = choice;
+
+            markTodayActive();
             saveData();
             renderFantasies();
+            renderEveningPlans();
 
-            const answers = appData.fantasies[index];
+            const answers = appData.fantasies[fantasyName];
             if ((answers.vanya === 'want' || answers.vanya === 'ready') && (answers.nastya === 'want' || answers.nastya === 'ready')) {
                 triggerConfetti();
-                addToHistory(`Фантазия совпала: "${FANTASIES_LIST[index]}" 🔥`);
+                addToHistory(`Фантазия совпала: "${fantasyName}" 🔥`);
             }
         }
 
