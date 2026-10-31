@@ -132,7 +132,7 @@
 
     <div class="relative z-10 max-w-md mx-auto px-4 pt-4">
 
-        <!-- Header / User Switcher + Счетчик дней вместе + Таймер до свидания -->
+        <!-- Header / User Switcher + Счетчик дней + Таймер пятницы -->
         <header class="glass-panel rounded-2xl p-3 mb-4 shadow-neon space-y-2">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -163,18 +163,17 @@
                 </button>
             </div>
 
-            <!-- Таймер до свидания / вечера пятницы -->
             <div class="bg-black/40 rounded-xl px-3 py-1.5 flex justify-between items-center text-[11px] border border-pink-500/20">
                 <span class="text-gray-300"><i class="fa-solid fa-clock text-neonGold mr-1"></i> До вечера пятницы:</span>
                 <span id="fridayTimer" class="font-bold text-pink-300 font-mono">00д 00ч 00м</span>
             </div>
         </header>
 
-        <!-- Индикатор «Уровня страсти» + Звание пары + Кто балует -->
+        <!-- Passion Meter & Ranks -->
         <div class="glass-panel rounded-2xl p-3 mb-4 space-y-2 border border-pink-500/30">
             <div class="flex justify-between items-center text-xs">
                 <span class="font-bold text-white flex items-center gap-1">
-                    <i class="fa-solid fa-fire text-neonPink"></i> Уровень Страсти (<span id="coupleRankName" class="text-neonGold">Новички</span>)
+                    <i class="fa-solid fa-fire text-neonPink"></i> Уровень (<span id="coupleRankName" class="text-neonGold">Новички</span>)
                 </span>
                 <span id="passionPercent" class="font-black text-pink-400">0%</span>
             </div>
@@ -189,7 +188,7 @@
 
         <!-- Dynamic Content Tabs -->
 
-        <!-- TAB 1: STICKERS (SCRATCH CARDS) -->
+        <!-- TAB 1: STICKERS -->
         <section id="tab-stickers" class="tab-content space-y-4">
             <div class="glass-panel rounded-2xl p-4 text-center relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-neonPink/20 rounded-full blur-xl"></div>
@@ -214,7 +213,7 @@
             <div id="scratchCardsContainer" class="space-y-4"></div>
         </section>
 
-        <!-- TAB 2: WISHLIST + КОЛЕСО ФОРТУНЫ КАПРИЗОВ -->
+        <!-- TAB 2: WISHES & FORTUNE WHEEL -->
         <section id="tab-wishes" class="tab-content hidden space-y-4">
             <div class="glass-panel rounded-2xl p-4 text-center space-y-2 border border-yellow-500/30">
                 <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
@@ -261,18 +260,33 @@
             <div id="wishesList" class="space-y-3"></div>
         </section>
 
-        <!-- TAB 3: CHAT & PING & HOT PHOTO LINK -->
+        <!-- TAB 3: CHAT, PING & LOVE NOTES -->
         <section id="tab-chat" class="tab-content hidden space-y-4">
-            <!-- Кнопка отправки Пинга -->
+            <!-- Пинг -->
             <div class="glass-panel rounded-2xl p-4 text-center space-y-2 border border-pink-500/40">
                 <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
                     <i class="fa-solid fa-heart-pulse text-neonPink"></i>
                     Напоминалка-Поцелуй (Пинг)
                 </h3>
-                <p class="text-[11px] text-gray-300">Нажми, чтобы у партнера на экране вспыхнуло сердце:</p>
                 <button onclick="sendPing()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-neonPink to-hotRose text-white font-bold text-xs shadow-neon flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> Сделать Пинг партнеру ❤️
                 </button>
+            </div>
+
+            <!-- Виртуальный ящик запечатанных записок -->
+            <div class="glass-panel rounded-2xl p-4 space-y-3 border border-purple-500/30">
+                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-envelope-open-text text-purple-400"></i>
+                    Ящик Любовных Записок 💌
+                </h3>
+                <div class="space-y-2">
+                    <input type="text" id="noteInput" placeholder="Оставить тайную записку..." 
+                           class="w-full bg-black/50 border border-purple-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
+                    <button onclick="addLoveNote()" class="w-full py-2 rounded-xl bg-gradient-to-r from-purple-600 to-neonPink font-bold text-xs text-white shadow-neon">
+                        🔏 Запечатать и отправить записку
+                    </button>
+                </div>
+                <div id="notesContainer" class="space-y-2 pt-1 max-h-40 overflow-y-auto"></div>
             </div>
 
             <div class="glass-panel rounded-2xl p-5 text-center space-y-3 border-2 border-neonPink/50 shadow-neon">
@@ -280,10 +294,6 @@
                     <i class="fa-solid fa-fire-flame-curved text-3xl"></i>
                 </div>
                 <h3 class="text-base font-extrabold text-white">Быстрая Интимная Связь</h3>
-                <p class="text-xs text-gray-300">
-                    Нажми кнопку ниже, чтобы моментально перейти в ЛС партнёра в Telegram и отправить горячие 18+ кадры!
-                </p>
-                
                 <button onclick="sendHotPhotoToTG()" class="w-full py-3 rounded-xl bg-gradient-to-r from-neonPink via-hotRose to-neonPurple text-white font-black text-sm tracking-wide shadow-glow transform active:scale-95 transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-camera-retro text-lg"></i>
                     🔥 ОТПРАВИТЬ ФОТО 18+ В ЛС
@@ -295,9 +305,7 @@
                     <i class="fa-solid fa-comments text-pink-400"></i>
                     Записки Страсти & Комментарии
                 </h3>
-
                 <div id="chatMessages" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
-
                 <div class="flex gap-2 pt-2 border-t border-white/10">
                     <input type="text" id="chatInput" placeholder="Напиши милость или пошлость..." 
                            class="flex-1 bg-black/50 border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-neonPink">
@@ -308,21 +316,67 @@
             </div>
         </section>
 
-        <!-- TAB 4: QUESTS & ROULETTE + ПЛАНЫ НА ВЕЧЕР + КАЛЕНДАРЬ -->
+        <!-- TAB 4: GAMES, TRUTH OR DARE, QUESTS & CALENDAR -->
         <section id="tab-quests" class="tab-content hidden space-y-5">
-            <!-- 1. Планы на вечер (История совпадений фантазий) -->
+            <!-- Карточная игра «Правда или Действие 18+» -->
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-3 border border-pink-500/40">
+                <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-masks-theater text-neonPink"></i>
+                    Карточная игра: Правда или Действие 18+ 🃏
+                </h3>
+                <div id="todCardBox" class="bg-black/50 p-4 rounded-xl border border-white/10 text-xs text-pink-200 min-h-[60px] flex items-center justify-center font-medium">
+                    Нажми кнопку ниже, чтобы вытянуть горячую карту!
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="drawTod('truth')" class="flex-1 py-2 rounded-xl bg-purple-600 text-white font-bold text-xs shadow-neon">
+                        ❓ Правда
+                    </button>
+                    <button onclick="drawTod('dare')" class="flex-1 py-2 rounded-xl bg-neonPink text-white font-bold text-xs shadow-neon">
+                        🔥 Действие
+                    </button>
+                </div>
+            </div>
+
+            <!-- Генератор идеальных свиданий -->
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-2 border border-purple-500/30">
+                <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-champagne-glasses text-neonGold"></i>
+                    Генератор Идеального Свидания 🍸
+                </h3>
+                <div id="dateGeneratorBox" class="bg-black/50 p-3 rounded-xl border border-white/10 text-xs text-pink-200 min-h-[45px] flex items-center justify-center font-medium">
+                    Нажми, чтобы спланировать сегодняшний вечер!
+                </div>
+                <button onclick="generateDatePlan()" class="w-full py-2 rounded-xl bg-gradient-to-r from-neonPurple to-neonPink font-bold text-xs text-white shadow-neon">
+                    ✨ Спланировать вечер
+                </button>
+            </div>
+
+            <!-- Рулетка выбора ролей на вечер -->
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-2 border border-yellow-500/30">
+                <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-crown text-neonGold"></i>
+                    Рулетка Ролей на Вечер 👑
+                </h3>
+                <div id="roleRouletteBox" class="bg-black/50 p-3 rounded-xl border border-white/10 text-xs text-yellow-200 min-h-[45px] flex items-center justify-center font-medium">
+                    Узнайте, кто сегодня главный в доме!
+                </div>
+                <button onclick="spinRoleRoulette()" class="w-full py-2 rounded-xl bg-gradient-to-r from-neonGold to-hotRose font-bold text-xs text-black shadow-neon-gold">
+                    🎲 Распределить роли
+                </button>
+            </div>
+
+            <!-- Планы на вечер (Совпадения фантазий) -->
             <div class="glass-panel rounded-2xl p-4 space-y-2 border border-neonPink/40">
                 <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
                     <i class="fa-solid fa-fire text-neonPink"></i>
                     🔥 Планы на вечер (Совпавшие фантазии)
                 </h3>
-                <p class="text-[11px] text-gray-300">То, что вы оба хотите или к чему готовы на сегодня:</p>
                 <div id="eveningPlansContainer" class="space-y-1.5">
                     <div class="text-center text-xs text-gray-500 py-2">Пока нет совпадений. Выбирайте фантазии ниже!</div>
                 </div>
             </div>
 
-            <!-- 2. Горячий календарь событий -->
+            <!-- Горячий календарь событий -->
             <div class="glass-panel rounded-2xl p-4 space-y-2">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-calendar-days text-pink-400"></i>
@@ -332,7 +386,7 @@
                 <div id="hotCalendarGrid" class="grid grid-cols-7 gap-1.5 pt-1 text-center text-xs"></div>
             </div>
 
-            <!-- 3. Купоны на желания -->
+            <!-- Купоны -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
                 <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
                     <i class="fa-solid fa-ticket text-neonPink"></i>
@@ -341,7 +395,7 @@
                 <div id="couponsContainer" class="grid grid-cols-1 gap-2"></div>
             </div>
 
-            <!-- 4. Поза Дня -->
+            <!-- Поза Дня -->
             <div class="glass-panel rounded-2xl p-4 text-center space-y-2 border border-purple-500/30">
                 <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
                     <i class="fa-solid fa-venus-mars text-neonPink"></i>
@@ -355,13 +409,12 @@
                 </button>
             </div>
 
-            <!-- 5. Passion Roulette -->
+            <!-- Рулетка Страсти -->
             <div class="glass-panel rounded-2xl p-4 text-center space-y-3">
                 <h3 class="text-sm font-extrabold text-white flex items-center justify-center gap-2">
                     <i class="fa-solid fa-dice text-neonGold text-base"></i>
                     Рулетка Быстрой Страсти 18+
                 </h3>
-
                 <div class="grid grid-cols-3 gap-2 bg-black/60 p-2 rounded-xl border border-white/10 my-2 text-center text-xs">
                     <div class="p-2 glass-card rounded-lg border-pink-500/20">
                         <span class="text-[10px] text-gray-400 block mb-1">ГДЕ?</span>
@@ -376,13 +429,12 @@
                         <span id="reelAction" class="font-bold text-yellow-300">❓</span>
                     </div>
                 </div>
-
                 <button onclick="spinRoulette()" id="btnSpin" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-neonPurple to-neonPink font-bold text-xs text-white shadow-neon flex items-center justify-center gap-2">
                     <i class="fa-solid fa-rotate"></i> КРУТИТЬ КОЛЕСО СТРАСТИ
                 </button>
             </div>
 
-            <!-- 6. Quests Progress -->
+            <!-- Квесты -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-trophy text-neonGold"></i>
@@ -391,7 +443,7 @@
                 <div id="questsContainer" class="space-y-2"></div>
             </div>
 
-            <!-- 7. Лента Воспоминаний -->
+            <!-- Архив -->
             <div class="glass-panel rounded-2xl p-4 space-y-2">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-scroll text-pink-400"></i>
@@ -402,7 +454,7 @@
                 </div>
             </div>
 
-            <!-- 8. Fantasies Matcher -->
+            <!-- Детектор Фантазий -->
             <div class="glass-panel rounded-2xl p-4 space-y-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-masks-theater text-neonPink"></i>
@@ -476,7 +528,7 @@
 
             <div class="pt-2 border-t border-white/10">
                 <button onclick="forceRefreshContent()" class="w-full py-2.5 rounded-xl bg-purple-600/80 hover:bg-purple-600 text-white font-bold text-xs shadow-neon flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-rotate"></i> 🔄 Обновить стирашки и квесты
+                    <i class="fa-solid fa-rotate"></i> 🔄 Обновить контент
                 </button>
             </div>
 
@@ -486,7 +538,7 @@
         </div>
     </div>
 
-    <!-- JS App Logic with All Features & Cloud Sync -->
+    <!-- JS Logic -->
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
             try {
@@ -531,6 +583,34 @@
             "✨ «Элегантный угол»: Стоя у края кровати или комода с поддержкой за талию."
         ];
 
+        const TRUTH_POOL = [
+            "Какая фантазия тебе больше всего нравится, но ты стесняешься о ней сказать?",
+            "Что самое безумное ты бы хотел(а) попробовать в постели?",
+            "Какое мое движение или прикосновение сводит тебя с ума?",
+            "О чем ты думал(а), когда смотрел(а) на меня сегодня утром?"
+        ];
+
+        const DARE_POOL = [
+            "Сделай страстный массаж шеи и плеч без одежды в течение 3 минут",
+            "Отправь интимное голосовое сообщение прямо сейчас",
+            "Поцелуй партнера в самое неожиданное место на 1 минуту",
+            "Сними элемент одежды и больше не надевай до конца вечера"
+        ];
+
+        const ROLES_POOL = [
+            "👑 Ваня — Господин, Настя — Послушница",
+            "👑 Настя — Королева, Ваня — Массажист",
+            "🔥 Абсолютное равенство и дикая страсть",
+            "😈 Ваня — Соблазнитель, Настя — Неприступная цель"
+        ];
+
+        const DATE_PLANS_POOL = [
+            "🍷 Фильм под пледом + домашние коктейли + страстный массаж",
+            "🛁 Ванна при свечах + легкий эротический массаж с маслом",
+            "🍕 Вкусная еда без одежды + просмотр любимого сериала",
+            "🎲 Игра в Правда или Действие + ночь абсолютной близости"
+        ];
+
         const ALL_QUESTS_POOL = [
             { title: "Секретное голосовое", desc: "Отправить партнеру пошлое шепотное голосовое в разгар дня", level: "Новички (18+)", category: "18+" },
             { title: "Новое место", desc: "Заняться сексом там, где вы этого еще никогда не делали", level: "Экстрим (18+)", category: "18+" },
@@ -571,8 +651,9 @@
             fantasies: {},
             activeFantasies: [],
             coupons: [],
+            notes: [],
             history: [],
-            activeDates: {} // Для календаря
+            activeDates: {}
         };
 
         window.onload = function() {
@@ -583,9 +664,11 @@
                 startFridayTimer();
                 renderAll();
                 pullFromCloud();
+                checkPing();
             } catch(e) {}
             
             setInterval(pullFromCloud, 2500);
+            setInterval(checkPing, 3000);
         };
 
         function calculateDaysTogether() {
@@ -607,7 +690,7 @@
                 const now = new Date();
                 const resultTime = new Date();
                 resultTime.setDate(now.getDate() + (5 + 7 - now.getDay()) % 7);
-                resultTime.setHours(19, 0, 0, 0); // Пятница 19:00
+                resultTime.setHours(19, 0, 0, 0);
 
                 if (now > resultTime) resultTime.setDate(resultTime.getDate() + 7);
 
@@ -694,6 +777,7 @@
             if (!appData.fantasies) appData.fantasies = {};
             if (!appData.activeFantasies || appData.activeFantasies.length === 0) appData.activeFantasies = FANTASIES_LIST.slice(0, 4);
             if (!appData.coupons || appData.coupons.length === 0) appData.coupons = JSON.parse(JSON.stringify(INITIAL_COUPONS));
+            if (!appData.notes) appData.notes = [];
             if (!appData.history) appData.history = [];
             if (!appData.wishes) appData.wishes = [];
             if (!appData.chat) appData.chat = [];
@@ -840,6 +924,7 @@
                 renderStickers();
                 renderWishes('all');
                 renderChat();
+                renderNotes();
                 renderQuests();
                 renderCoupons();
                 renderFantasies();
@@ -869,7 +954,7 @@
         function checkPing() {
             if (appData.pings && appData.pings[currentUser]) {
                 const ping = appData.pings[currentUser];
-                if (Date.now() - ping.time < 15000) { // Актуально 15 секунд
+                if (Date.now() - ping.time < 15000) {
                     const overlay = document.getElementById('pingOverlay');
                     const textEl = document.getElementById('pingText');
                     if (overlay && textEl) {
@@ -899,6 +984,37 @@
             triggerConfetti();
         }
 
+        function drawTod(type) {
+            const pool = type === 'truth' ? TRUTH_POOL : DARE_POOL;
+            const item = pool[Math.floor(Math.random() * pool.length)];
+            const box = document.getElementById('todCardBox');
+            if (box) {
+                box.innerHTML = `<span class="text-white font-bold">${type === 'truth' ? '❓ Вопрос:' : '🔥 Действие:'} ${item}</span>`;
+            }
+            markTodayActive();
+            triggerConfetti();
+        }
+
+        function generateDatePlan() {
+            const plan = DATE_PLANS_POOL[Math.floor(Math.random() * DATE_PLANS_POOL.length)];
+            const box = document.getElementById('dateGeneratorBox');
+            if (box) {
+                box.innerHTML = `<span class="text-white font-bold">${plan}</span>`;
+            }
+            markTodayActive();
+            triggerConfetti();
+        }
+
+        function spinRoleRoulette() {
+            const role = ROLES_POOL[Math.floor(Math.random() * ROLES_POOL.length)];
+            const box = document.getElementById('roleRouletteBox');
+            if (box) {
+                box.innerHTML = `<span class="text-white font-bold">${role}</span>`;
+            }
+            markTodayActive();
+            triggerConfetti();
+        }
+
         function spinFortuneWish() {
             if (!appData.wishes || appData.wishes.length === 0) {
                 const box = document.getElementById('fortuneWishResult');
@@ -912,6 +1028,52 @@
             }
             markTodayActive();
             triggerConfetti();
+        }
+
+        function addLoveNote() {
+            const input = document.getElementById('noteInput');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+
+            if (!appData.notes) appData.notes = [];
+            appData.notes.unshift({
+                id: Date.now(),
+                text: text,
+                author: currentUser,
+                date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+            });
+
+            input.value = '';
+            markTodayActive();
+            saveData();
+            renderNotes();
+            triggerConfetti();
+        }
+
+        function renderNotes() {
+            const container = document.getElementById('notesContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const list = appData.notes || [];
+            if (list.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs text-gray-500 py-2">Записок пока нет. Оставьте первую! 💌</div>`;
+                return;
+            }
+
+            list.forEach(note => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-xl p-2.5 text-xs border border-purple-500/20 space-y-1';
+                card.innerHTML = `
+                    <div class="flex justify-between text-[10px] text-purple-300">
+                        <span>От: ${note.author === 'vanya' ? '♂ Вани' : '♀ Насти'}</span>
+                        <span>${note.date}</span>
+                    </div>
+                    <p class="text-white font-medium">💌 "${note.text}"</p>
+                `;
+                container.appendChild(card);
+            });
         }
 
         function renderStickers() {
@@ -1418,7 +1580,6 @@
             const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
             if (title) title.innerText = `Активность за ${monthNames[month]} ${year}:`;
 
-            // Шапка дней недели
             ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].forEach(d => {
                 const header = document.createElement('div');
                 header.className = 'text-[10px] font-bold text-gray-500';
@@ -1426,7 +1587,6 @@
                 grid.appendChild(header);
             });
 
-            // Пустые ячейки для сдвига месяца
             let firstDay = new Date(year, month, 1).getDay();
             firstDay = firstDay === 0 ? 6 : firstDay - 1;
             for (let i = 0; i < firstDay; i++) {
